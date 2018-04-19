@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="br.com.seocursos.seocursos.MainActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <android.support.v7.widget.CardView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_margin="8dp"
+            android:onClick="cursos">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackground"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/cvImage1"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginRight="18dp"
+                    android:layout_marginEnd="18dp"
+                    android:src="@drawable/ic_book" />
+
+                <TextView
+                    android:id="@+id/cvTitulo1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@+id/cvImage1"
+                    android:layout_toEndOf="@+id/cvImage1"
+                    android:paddingBottom="5dp"
+                    android:textColor="@color/darkGrey"
+                    android:text="@string/cursos"
+                    android:textSize="30sp" />
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+        <android.support.v7.widget.CardView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_margin="8dp"
+            android:onClick="usuarios">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackground"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/cvImage2"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginRight="18dp"
+                    android:layout_marginEnd="18dp"
+                    android:src="@drawable/ic_person" />
+
+                <TextView
+                    android:id="@+id/cvTitulo2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@+id/cvImage2"
+                    android:layout_toEndOf="@+id/cvImage2"
+                    android:paddingBottom="5dp"
+                    android:textColor="@color/darkGrey"
+                    android:text="@string/usuarios"
+                    android:textSize="30sp" />
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+        <android.support.v7.widget.CardView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_margin="8dp"
+            android:onClick="disciplinas">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackground"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/cvImage3"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginRight="18dp"
+                    android:layout_marginEnd="18dp"
+                    android:src="@drawable/ic_library_books" />
+
+                <TextView
+                    android:id="@+id/cvTitulo3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@+id/cvImage3"
+                    android:layout_toEndOf="@+id/cvImage3"
+                    android:paddingBottom="5dp"
+                    android:textColor="@color/darkGrey"
+                    android:text="@string/disciplinas"
+                    android:textSize="30sp" />
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+        <android.support.v7.widget.CardView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_margin="8dp"
+            android:onClick="tarefas">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackground"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/cvImage4"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginRight="18dp"
+                    android:layout_marginEnd="18dp"
+                    android:src="@drawable/ic_description" />
+
+                <TextView
+                    android:id="@+id/cvTitulo5"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@+id/cvImage4"
+                    android:layout_toEndOf="@+id/cvImage4"
+                    android:paddingBottom="5dp"
+                    android:textColor="@color/darkGrey"
+                    android:text="@string/tarefas"
+                    android:textSize="30sp" />
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+        <android.support.v7.widget.CardView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_margin="8dp"
+            android:onClick="eventos">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackground"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/cvImage6"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginRight="18dp"
+                    android:layout_marginEnd="18dp"
+                    android:src="@drawable/ic_event" />
+
+                <TextView
+                    android:id="@+id/cvTitulo6"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@+id/cvImage6"
+                    android:layout_toEndOf="@+id/cvImage6"
+                    android:paddingBottom="5dp"
+                    android:textColor="@color/darkGrey"
+                    android:text="@string/eventos"
+                    android:textSize="30sp" />
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+        <android.support.v7.widget.CardView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_margin="8dp"
+            android:onClick="enquetes">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackground"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/cvImage7"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginRight="18dp"
+                    android:layout_marginEnd="18dp"
+                    android:src="@drawable/ic_poll" />
+
+                <TextView
+                    android:id="@+id/cvTitulo7"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@+id/cvImage7"
+                    android:layout_toEndOf="@+id/cvImage7"
+                    android:paddingBottom="5dp"
+                    android:textColor="@color/darkGrey"
+                    android:text="@string/enquetes"
+                    android:textSize="30sp" />
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+        <android.support.v7.widget.CardView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_margin="8dp"
+            android:onClick="chat">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackground"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/cvImage9"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginRight="18dp"
+                    android:layout_marginEnd="18dp"
+                    android:src="@drawable/ic_question_answer" />
+
+                <TextView
+                    android:id="@+id/cvTitulo9"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@+id/cvImage9"
+                    android:layout_toEndOf="@+id/cvImage9"
+                    android:paddingBottom="5dp"
+                    android:textColor="@color/darkGrey"
+                    android:text="@string/chat"
+                    android:textSize="30sp" />
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
+</ScrollView>

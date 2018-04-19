@@ -1,0 +1,94 @@
+<resources>
+    <string name="app_name">SEO Cursos</string>
+
+    <string name="fazerLogin">Fazer Login</string>
+    <string name="minhaConta">Minha Conta</string>
+    <string name="sair">Sair</string>
+    <string name="cadastreSeAqui">Cadastre-se Aqui!</string>
+    <string name="esqueciMinhaSenha">Esqueci Minha Senha</string>
+
+    <!--Páginas para acesso-->
+    <string name="cursos">Cursos</string>
+    <string name="usuarios">Usuários</string>
+    <string name="disciplinas">Disciplinas</string>
+    <string name="tarefas">Tarefas</string>
+    <string name="eventos">Eventos</string>
+    <string name="enquetes">Enquetes</string>
+    <string name="videoAulas">Video Aulas</string>
+    <string name="chat">Chat</string>
+
+    <!--Título das Páginas-->
+    <string name="novoCurso">Novo Curso</string>
+    <string name="novaDisciplina">Nova Disciplina</string>
+    <string name="novaTarefa">Nova Tarefa</string>
+    <string name="novoUsuario">Novo Usuário</string>
+    <string name="novoEvento">Novo Evento</string>
+    <string name="novaEnquete">Nova Enquete</string>
+
+    <string name="editarCurso">Editar Curso</string>
+    <string name="editarDisciplina">Editar Disciplina</string>
+    <string name="editarTarefa">Editar Tarefa</string>
+    <string name="editarUsuario">Editar Usuário</string>
+    <string name="editarEvento">Editar Evento</string>
+    <string name="editarEnquete">Editar Enquete</string>
+
+    <!--Inputs de Usuário-->
+    <string name="nome">Nome</string>
+    <string name="senha">Senha</string>
+    <string name="confirmarSenha">Confirmar Senha</string>
+    <string name="email">E-mail</string>
+    <string name="sexo">Sexo</string>
+    <string name="masculino">Masculino</string>
+    <string name="feminino">Feminino</string>
+    <string name="cpf">CPF</string>
+    <string name="cep">CEP</string>
+    <string name="endereco">Endereço</string>
+    <string name="numero">Número</string>
+    <string name="cidade">Cidade</string>
+    <string name="estado">Estado</string>
+    <string name="confirmar">Confirmar</string>
+    <string name="telefone">Telefone</string>
+    <string name="modalidade">Modalidade</string>
+    <string name="semipresencial">Semipresencial</string>
+    <string name="ead">EaD</string>
+    <string name="dataNascimento">Data de Nascimento</string>
+
+    <!--Inputs de Curso-->
+    <string name="preRequisito">Pré-requisitos</string>
+
+    <!--Inputs de Tarefa-->
+    <string name="descricao">Descrição</string>
+    <string name="disciplina">Disciplina</string>
+
+    <!--Inputs de Disciplina-->
+    <string name="nivel">Nível</string>
+    <string name="gratis">Grátis</string>
+    <string name="tecnico">Técnico</string>
+    <string name="graduacao">Graduação</string>
+    <string name="posGraduacao">Pós Graduação</string>
+    <string name="cargaHoraria">Carga Horária</string>
+    <string name="duracao">Duração (Semestres)</string>
+    <string name="area">Área</string>
+    <string name="curso">Curso</string>
+
+    <!--Inputs de Enquete-->
+    <string name="pergunta">Pergunta</string>
+    <string name="respostaA">Resposta A</string>
+    <string name="respostaB">Resposta B</string>
+    <string name="respostaC">Resposta C</string>
+    <string name="respostaD">Resposta D</string>
+    <string name="respostaE">Resposta E</string>
+
+    <!--Inputs de Evento-->
+    <string name="local">Local</string>
+    <string name="dia">Dia</string>
+    <string name="preco">Preço</string>
+    <string name="formaPagamento">Forma de Pagamento</string>
+    <string name="dinheiro">Dinheiro</string>
+    <string name="cartaoDebito">Cartão de Débito</string>
+    <string name="cartaoCredito">Cartão de Crédito</string>
+
+    <!--Inputs de Chat-->
+    <string name="enviar">Enviar</string>
+    <string name="escrevaAqui">Escreva Aqui</string>
+</resources>

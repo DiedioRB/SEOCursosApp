@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_seocursos" default="compile.module.seocursos">
+  <dirname property="module.seocursos.basedir" file="${ant.file.module_seocursos}"/>
+  
+  <property name="module.jdk.home.seocursos" value="${jdk.home.1.8}"/>
+  <property name="module.jdk.bin.seocursos" value="${jdk.bin.1.8}"/>
+  <property name="module.jdk.classpath.seocursos" value="jdk.classpath.1.8"/>
+  
+  <property name="compiler.args.seocursos" value="-encoding UTF-8 -source 1.7 -target 1.7 ${compiler.args}"/>
+  
+  <property name="seocursos.output.dir" value="${module.seocursos.basedir}/build/classes/production/SEOCursos"/>
+  <property name="seocursos.testoutput.dir" value="${module.seocursos.basedir}/build/classes/test/SEOCursos"/>
+  
+  <path id="seocursos.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="seocursos.module.production.classpath">
+    <path refid="${module.jdk.classpath.seocursos}"/>
+  </path>
+  
+  <path id="seocursos.runtime.production.module.classpath">
+    <pathelement location="${seocursos.output.dir}"/>
+  </path>
+  
+  <path id="seocursos.module.classpath">
+    <path refid="${module.jdk.classpath.seocursos}"/>
+    <pathelement location="${seocursos.output.dir}"/>
+  </path>
+  
+  <path id="seocursos.runtime.module.classpath">
+    <pathelement location="${seocursos.testoutput.dir}"/>
+    <pathelement location="${seocursos.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.seocursos">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.seocursos">
+    <patternset refid="excluded.from.module.seocursos"/>
+  </patternset>
+  
+  
+  <target name="compile.module.seocursos" depends="compile.module.seocursos.production,compile.module.seocursos.tests" description="Compile module SEOCursos"/>
+  
+  <target name="compile.module.seocursos.production" depends="register.custom.compilers" description="Compile module SEOCursos; production classes"/>
+  
+  <target name="compile.module.seocursos.tests" depends="register.custom.compilers,compile.module.seocursos.production" description="compile module SEOCursos; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.seocursos" description="cleanup module">
+    <delete dir="${seocursos.output.dir}"/>
+    <delete dir="${seocursos.testoutput.dir}"/>
+  </target>
+</project>
