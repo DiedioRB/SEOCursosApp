@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import br.com.seocursos.seocursos.Outros.CRUD;
+import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class EditEnqueteActivity extends AppCompatActivity {
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/enquetes.php";
@@ -28,10 +30,14 @@ public class EditEnqueteActivity extends AppCompatActivity {
     TextInputEditText pergunta,respostaA,respostaB,respostaC,respostaD,respostaE;
     Button btn;
 
+    ProgressDialogHelper pd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_enquete);
+
+        pd = new ProgressDialogHelper(EditEnqueteActivity.this);
 
         pergunta = findViewById(R.id.pergunta);
         respostaA = findViewById(R.id.respostaA);
@@ -55,6 +61,7 @@ public class EditEnqueteActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                pd.open();
                 Map<String,String> params = new HashMap<String,String>();
 
                 params.put("id_enquete", id);
@@ -85,6 +92,12 @@ public class EditEnqueteActivity extends AppCompatActivity {
                 },params,EditEnqueteActivity.this);
                 RequestQueue rq = VolleySingleton.getInstance(EditEnqueteActivity.this).getRequestQueue();
                 rq.add(sr);
+                rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                    @Override
+                    public void onRequestFinished(Request<Object> request) {
+                        pd.close();
+                    }
+                });
             }
         });
 
@@ -92,6 +105,7 @@ public class EditEnqueteActivity extends AppCompatActivity {
     }
 
     public void carregar(){
+        pd.open();
         String url = "https://www.seocursos.com.br/PHP/Android/enquetes.php";
 
         StringRequest sr = CRUD.selecionarEditar(url, new Response.Listener<String>() {
@@ -125,5 +139,11 @@ public class EditEnqueteActivity extends AppCompatActivity {
         },EditEnqueteActivity.this,id);
         RequestQueue rq = VolleySingleton.getInstance(EditEnqueteActivity.this).getRequestQueue();
         rq.add(sr);
+        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+            @Override
+            public void onRequestFinished(Request<Object> request) {
+                pd.close();
+            }
+        });
     }
 }

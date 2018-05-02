@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -33,6 +34,7 @@ import java.util.Map;
 
 import br.com.jansenfelipe.androidmask.MaskEditTextChangedListener;
 import br.com.seocursos.seocursos.Outros.CRUD;
+import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 import br.com.seocursos.seocursos.Outros.ValidaCPF;
 
 public class AddUsuarioActivity extends AppCompatActivity {
@@ -45,11 +47,16 @@ public class AddUsuarioActivity extends AppCompatActivity {
     Button btn;
     ImageView iv;
 
+    ProgressDialogHelper pd;
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_usuario);
+
+        pd = new ProgressDialogHelper(AddUsuarioActivity.this);
+
         //Recupera os elementos pelo ID
         nome = (TextInputEditText)findViewById(R.id.nomeUsuario);
         senha = (TextInputEditText)findViewById(R.id.senhaUsuario);
@@ -79,6 +86,7 @@ public class AddUsuarioActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                pd.open();
                 Map<String, String> params = new HashMap<String, String>();
 
                 params.put("nome", nome.getText().toString());
@@ -140,6 +148,12 @@ public class AddUsuarioActivity extends AppCompatActivity {
                 },params,getApplicationContext());
                 RequestQueue rq = VolleySingleton.getInstance(AddUsuarioActivity.this).getRequestQueue();
                 rq.add(sr);
+                rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                    @Override
+                    public void onRequestFinished(Request<Object> request) {
+                        pd.close();
+                    }
+                });
             }
         });
 
@@ -147,6 +161,7 @@ public class AddUsuarioActivity extends AppCompatActivity {
             @Override
             public void onFocusChange(View view, boolean b) {
                 if(!b){
+                    pd.open();
                     String sendCpf = cpf.getText().toString();
                     sendCpf = sendCpf.replace(".", "");
                     sendCpf = sendCpf.replace("-", "");
@@ -161,6 +176,7 @@ public class AddUsuarioActivity extends AppCompatActivity {
                         btn.setBackgroundColor(getResources().getColor(R.color.blueAccent2));
                         btn.setTextColor(getResources().getColor(R.color.white));
                     }
+                    pd.close();
                 }
             }
         });
@@ -168,6 +184,7 @@ public class AddUsuarioActivity extends AppCompatActivity {
             @Override
             public void onFocusChange(View view, boolean b) {
                 if(!b){
+                    pd.open();
                     String sendCep = cep.getText().toString();
                     sendCep = sendCep.replace(".", "");
                     sendCep = sendCep.replace("-", "");
@@ -201,6 +218,12 @@ public class AddUsuarioActivity extends AppCompatActivity {
                     });
                     RequestQueue rq = VolleySingleton.getInstance(AddUsuarioActivity.this).getRequestQueue();
                     rq.add(sr);
+                    rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                        @Override
+                        public void onRequestFinished(Request<Object> request) {
+                            pd.close();
+                        }
+                    });
                 }
             }
         });

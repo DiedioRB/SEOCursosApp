@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">SEO Cursos</string>
+    <string name="facebook_app_id">1530907060331272</string>
+    <string name="fb_login_protocol_scheme">fb1530907060331272</string>
 
     <string name="fazerLogin">Fazer Login</string>
     <string name="minhaConta">Minha Conta</string>
@@ -16,6 +18,7 @@
     <string name="enquetes">Enquetes</string>
     <string name="videoAulas">Video Aulas</string>
     <string name="chat">Chat</string>
+    <string name="ebooks">E-books</string>
 
     <!--Título das Páginas-->
     <string name="novoCurso">Novo Curso</string>
@@ -91,4 +94,14 @@
     <!--Inputs de Chat-->
     <string name="enviar">Enviar</string>
     <string name="escrevaAqui">Escreva Aqui</string>
+
+    <!--Info Curso-->
+    <string name="nivelInfo">Nível:</string>
+    <string name="precoInfo">Preço:</string>
+    <string name="cargaHorariaInfo">Carga Horária:</string>
+    <string name="areaInfo">Área:</string>
+    <string name="preRequisitosInfo">Pré-requisitos:</string>
+    <string name="inscreverSe">Inscrever-se</string>
+    <string name="voltar">Voltar</string>
+
 </resources>

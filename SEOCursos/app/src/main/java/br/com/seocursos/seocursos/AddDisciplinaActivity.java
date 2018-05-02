@@ -5,17 +5,16 @@ import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,6 +26,7 @@ import java.util.Map;
 
 import br.com.seocursos.seocursos.ConstClasses.Curso;
 import br.com.seocursos.seocursos.Outros.CRUD;
+import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class AddDisciplinaActivity extends AppCompatActivity {
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/disciplinas.php";
@@ -39,11 +39,14 @@ public class AddDisciplinaActivity extends AppCompatActivity {
     ArrayList<Curso> listaCursos;
 
     String id;
+    ProgressDialogHelper pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_disciplina);
+
+        pd = new ProgressDialogHelper(AddDisciplinaActivity.this);
 
         nome = findViewById(R.id.nome);
         cargaHoraria = findViewById(R.id.cargaHoraria);
@@ -64,6 +67,7 @@ public class AddDisciplinaActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                pd.open();
                 Map<String,String> params = new HashMap<String,String>();
                 params.put("nome", nome.getText().toString());
                 params.put("cargaHoraria", cargaHoraria.getText().toString());
@@ -123,10 +127,17 @@ public class AddDisciplinaActivity extends AppCompatActivity {
                 },params,AddDisciplinaActivity.this);
                 RequestQueue rq = VolleySingleton.getInstance(AddDisciplinaActivity.this).getRequestQueue();
                 rq.add(sr);
+                rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                    @Override
+                    public void onRequestFinished(Request<Object> request) {
+                        pd.close();
+                    }
+                });
             }
         });
     }
     public void carregar(){
+        pd.open();
         String url = "https://seocursos.com.br/PHP/Android/cursos.php";
         StringRequest sr = CRUD.selecionar(url, new Response.Listener<String>() {
             @Override
@@ -149,5 +160,11 @@ public class AddDisciplinaActivity extends AppCompatActivity {
         }, getApplicationContext());
         RequestQueue rq = VolleySingleton.getInstance(AddDisciplinaActivity.this).getRequestQueue();
         rq.add(sr);
+        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+            @Override
+            public void onRequestFinished(Request<Object> request) {
+                pd.close();
+            }
+        });
     }
 }

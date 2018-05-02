@@ -1,26 +1,71 @@
 package br.com.seocursos.seocursos;
 
 import android.content.Intent;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.Toast;
+
+import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+
+import br.com.seocursos.seocursos.Fragments.AdministradorMenu;
+import br.com.seocursos.seocursos.Fragments.AlunoMenu;
+import br.com.seocursos.seocursos.Fragments.TutorMenu;
 
 public class MainActivity extends AppCompatActivity {
-    SharedPreferencesSingleton helper;
+    private String nome;
+
+    LinearLayout container;
+    SharedPreferencesHelper helper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        container = findViewById(R.id.container);
 
-        helper = SharedPreferencesSingleton.getInstance(MainActivity.this);
+        helper = new SharedPreferencesHelper(MainActivity.this);
         if(!helper.getBoolean("login")){
             Intent i = new Intent(MainActivity.this, LoginActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(i);
+        }
+        nome = helper.getString("nome");
+
+        try {
+            Fragment menu = null;
+            String privilegio = helper.getString("privilegio");
+            if(privilegio != null) {
+                switch (helper.getString("privilegio")) {
+                    case "A":
+                        menu = AlunoMenu.newInstance();
+                        break;
+                    case "T":
+                        menu = TutorMenu.newInstance();
+                        break;
+                    case "D":
+                        menu = AdministradorMenu.newInstance();
+                        break;
+                    default:
+                        Toast.makeText(MainActivity.this, "Erro ao carregar o menu!", Toast.LENGTH_SHORT).show();
+                        sair();
+                        break;
+                }
+                LayoutInflater inflater = getLayoutInflater();
+                View v = menu.onCreateView(inflater, null, savedInstanceState);
+                container.addView(v, 0);
+            }
+        }catch(NullPointerException e){
+            e.printStackTrace();
         }
     }
     @Override
@@ -40,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
     public void usuarios(View v){
         Intent i = new Intent(MainActivity.this, UsuariosActivity.class);
         startActivity(i);
@@ -74,7 +118,21 @@ public class MainActivity extends AppCompatActivity {
         helper.setString("id", null);
         helper.setString("nome", null);
         helper.setString("email", null);
+        helper.setString("privilegio", null);
+
+        LoginManager.getInstance().logOut();
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail().build();
+        GoogleSignInClient client = GoogleSignIn.getClient(this, gso);
+        client.signOut();
+
         Intent i = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(i);
+    }
+
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
     }
 }

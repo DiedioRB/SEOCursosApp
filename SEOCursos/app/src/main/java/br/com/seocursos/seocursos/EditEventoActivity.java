@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
@@ -27,6 +28,7 @@ import java.util.Map;
 
 import br.com.seocursos.seocursos.ConstClasses.Evento;
 import br.com.seocursos.seocursos.Outros.CRUD;
+import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class EditEventoActivity extends AppCompatActivity {
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/eventos.php";
@@ -36,10 +38,14 @@ public class EditEventoActivity extends AppCompatActivity {
     CheckBox dinheiro,cartaoCredito,cartaoDebito;
     Button btn;
 
+    ProgressDialogHelper pd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_evento);
+
+        pd = new ProgressDialogHelper(EditEventoActivity.this);
 
         Intent intent = getIntent();
         try{
@@ -72,6 +78,7 @@ public class EditEventoActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                pd.open();
                 Map<String,String> params = new HashMap<String,String>();
 
                 try {
@@ -123,6 +130,12 @@ public class EditEventoActivity extends AppCompatActivity {
                     }, params, EditEventoActivity.this);
                     RequestQueue rq = VolleySingleton.getInstance(EditEventoActivity.this).getRequestQueue();
                     rq.add(sr);
+                    rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                        @Override
+                        public void onRequestFinished(Request<Object> request) {
+                            pd.close();
+                        }
+                    });
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -131,6 +144,7 @@ public class EditEventoActivity extends AppCompatActivity {
     }
 
     public void carregar(){
+        pd.open();
         StringRequest sr = CRUD.selecionarEditar(JSON_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -172,5 +186,11 @@ public class EditEventoActivity extends AppCompatActivity {
         },EditEventoActivity.this, id);
         RequestQueue rq = VolleySingleton.getInstance(EditEventoActivity.this).getRequestQueue();
         rq.add(sr);
+        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+            @Override
+            public void onRequestFinished(Request<Object> request) {
+                pd.close();
+            }
+        });
     }
 }

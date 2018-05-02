@@ -19,12 +19,11 @@ import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,6 +36,7 @@ import java.util.Map;
 
 import br.com.seocursos.seocursos.ConstClasses.Evento;
 import br.com.seocursos.seocursos.Outros.CRUD;
+import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class EventosActivity extends AppCompatActivity implements SearchView.OnQueryTextListener{
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/eventos.php";
@@ -45,23 +45,39 @@ public class EventosActivity extends AppCompatActivity implements SearchView.OnQ
     FloatingActionButton fab;
     SearchView sv;
 
+    ProgressDialogHelper pd;
+    SharedPreferencesHelper helper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_eventos);
 
+        pd = new ProgressDialogHelper(EventosActivity.this);
+        helper = new SharedPreferencesHelper(EventosActivity.this);
+
         lv = (ListView) findViewById(R.id.lv);
         lista = new ArrayList<Evento>();
-        registerForContextMenu(lv);
         fab = findViewById(R.id.fab);
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(EventosActivity.this, AddEventoActivity.class);
-                startActivity(i);
-            }
-        });
+        if(helper.getString("privilegio").equals("D")) {
+            registerForContextMenu(lv);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent i = new Intent(EventosActivity.this, AddEventoActivity.class);
+                    startActivity(i);
+                }
+            });
+            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    view.performLongClick();
+                }
+            });
+        }else{
+            fab.setVisibility(View.GONE);
+        }
 
         lv.setTextFilterEnabled(true);
         sv = findViewById(R.id.sv);
@@ -128,6 +144,7 @@ public class EventosActivity extends AppCompatActivity implements SearchView.OnQ
         return true;
     }
     public void carregar(){
+        pd.open();
         lista.clear();
         //Requisição à página por método POST
         StringRequest sr = CRUD.selecionar(JSON_URL,new Response.Listener<String>() {
@@ -160,6 +177,12 @@ public class EventosActivity extends AppCompatActivity implements SearchView.OnQ
         //Adiciona a requisição à fila
         RequestQueue rq = VolleySingleton.getInstance(EventosActivity.this).getRequestQueue();
         rq.add(sr);
+        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+            @Override
+            public void onRequestFinished(Request<Object> request) {
+                pd.close();
+            }
+        });
     }
 
     //Classe interna para criar o adapter da classe externa

@@ -5,7 +5,6 @@ import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.RadioButton;
@@ -13,6 +12,7 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
@@ -28,6 +28,7 @@ import java.util.Map;
 import br.com.seocursos.seocursos.ConstClasses.Curso;
 import br.com.seocursos.seocursos.ConstClasses.Disciplina;
 import br.com.seocursos.seocursos.Outros.CRUD;
+import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class EditDisciplinaActivity extends AppCompatActivity {
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/disciplinas.php";
@@ -41,11 +42,14 @@ public class EditDisciplinaActivity extends AppCompatActivity {
     ArrayList<Curso> listaCursos;
 
     String idCurso;
+    ProgressDialogHelper pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_disciplina);
+
+        pd = new ProgressDialogHelper(EditDisciplinaActivity.this);
 
         Intent intent = getIntent();
 
@@ -78,6 +82,7 @@ public class EditDisciplinaActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                pd.open();
                 Map<String,String> params = new HashMap<String,String>();
                 params.put("idDisciplina", id);
                 params.put("nome", nome.getText().toString());
@@ -136,12 +141,25 @@ public class EditDisciplinaActivity extends AppCompatActivity {
                 },params,EditDisciplinaActivity.this);
                 RequestQueue rq = VolleySingleton.getInstance(EditDisciplinaActivity.this).getRequestQueue();
                 rq.add(sr);
+                rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                    @Override
+                    public void onRequestFinished(Request<Object> request) {
+                        pd.close();
+                    }
+                });
             }
         });
     }
     public void carregar(){
+        pd.open();
         String url = "https://seocursos.com.br/PHP/Android/cursos.php";
         RequestQueue rq = VolleySingleton.getInstance(EditDisciplinaActivity.this).getRequestQueue();
+        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+            @Override
+            public void onRequestFinished(Request<Object> request) {
+                pd.close();
+            }
+        });
 
         StringRequest sr = CRUD.selecionarEditar(JSON_URL, new Response.Listener<String>() {
             @Override

@@ -10,6 +10,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import br.com.seocursos.seocursos.Outros.CRUD;
+import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class EditCursoActivity extends AppCompatActivity {
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/cursos.php";
@@ -31,10 +33,14 @@ public class EditCursoActivity extends AppCompatActivity {
     RadioGroup tipo;
     Button btn;
 
+    ProgressDialogHelper pd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_curso);
+
+        pd = new ProgressDialogHelper(EditCursoActivity.this);
 
         Intent intent = getIntent();
         try{
@@ -61,6 +67,7 @@ public class EditCursoActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                pd.open();
                 Map<String,String> params = new HashMap<String,String>();
                 params.put("idCurso",id);
 
@@ -112,11 +119,18 @@ public class EditCursoActivity extends AppCompatActivity {
                 },params, EditCursoActivity.this);
                 RequestQueue rq = VolleySingleton.getInstance(EditCursoActivity.this).getRequestQueue();
                 rq.add(sr);
+                rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                    @Override
+                    public void onRequestFinished(Request<Object> request) {
+                        pd.close();
+                    }
+                });
             }
         });
     }
 
     public void carregar(){
+        pd.open();
         StringRequest sr = CRUD.selecionarEditar(JSON_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -155,5 +169,11 @@ public class EditCursoActivity extends AppCompatActivity {
         },EditCursoActivity.this, id);
         RequestQueue rq = VolleySingleton.getInstance(EditCursoActivity.this).getRequestQueue();
         rq.add(sr);
+        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+            @Override
+            public void onRequestFinished(Request<Object> request) {
+                pd.close();
+            }
+        });
     }
 }

@@ -24,9 +24,7 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,8 +36,8 @@ import java.util.List;
 import java.util.Map;
 
 import br.com.seocursos.seocursos.ConstClasses.Curso;
-import br.com.seocursos.seocursos.ConstClasses.Disciplina;
 import br.com.seocursos.seocursos.Outros.CRUD;
+import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class CursosActivity extends AppCompatActivity implements SearchView.OnQueryTextListener{
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/cursos.php";
@@ -48,23 +46,51 @@ public class CursosActivity extends AppCompatActivity implements SearchView.OnQu
     FloatingActionButton fab;
     SearchView sv;
 
+    ProgressDialogHelper pd;
+    SharedPreferencesHelper helper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cursos);
 
+        pd = new ProgressDialogHelper(CursosActivity.this);
+        helper = new SharedPreferencesHelper(CursosActivity.this);
+
         lvCursos = (ListView)findViewById(R.id.lvCursos);
         lista = new ArrayList<Curso>();
         fab = findViewById(R.id.fabCursos);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(CursosActivity.this, AddCursoActivity.class);
-                startActivity(i);
-            }
-        });
 
-        registerForContextMenu(lvCursos);
+        if(helper.getString("privilegio").equals("D")) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent i = new Intent(CursosActivity.this, AddCursoActivity.class);
+                    startActivity(i);
+                }
+            });
+            registerForContextMenu(lvCursos);
+            lvCursos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    view.performLongClick();
+                }
+            });
+        }else{
+            fab.setVisibility(View.GONE);
+            if(helper.getString("privilegio").equals("A")){
+                lvCursos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        Intent j = new Intent(CursosActivity.this, InfoCursoActivity.class);
+                        Curso curso = lista.get(i);
+                        j.putExtra("id",curso.getId());
+                        j.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(j);
+                    }
+                });
+            }
+        }
 
         lvCursos.setTextFilterEnabled(true);
         sv = findViewById(R.id.svCursos);
@@ -133,6 +159,7 @@ public class CursosActivity extends AppCompatActivity implements SearchView.OnQu
     }
 
     public void carregar(){
+        pd.open();
         //Requisição à página por método POST
         StringRequest sr = CRUD.selecionar(JSON_URL,
                 new Response.Listener<String>() {
@@ -166,6 +193,12 @@ public class CursosActivity extends AppCompatActivity implements SearchView.OnQu
         //Adiciona a requisição à fila
         RequestQueue rq = VolleySingleton.getInstance(CursosActivity.this).getRequestQueue();
         rq.add(sr);
+        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+            @Override
+            public void onRequestFinished(Request<Object> request) {
+                pd.close();
+            }
+        });
     }
 
     //Classe interna para criar o adapter da classe externa

@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import br.com.seocursos.seocursos.Outros.CRUD;
+import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class AddEventoActivity extends AppCompatActivity {
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/eventos.php";
@@ -33,10 +35,14 @@ public class AddEventoActivity extends AppCompatActivity {
     CheckBox dinheiro,cartaoCredito,cartaoDebito;
     Button btn;
 
+    ProgressDialogHelper pd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_evento);
+
+        pd = new ProgressDialogHelper(AddEventoActivity.this);
 
         nome = findViewById(R.id.nome);
         local = findViewById(R.id.local);
@@ -57,6 +63,7 @@ public class AddEventoActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                pd.open();
                 Map<String,String> params = new HashMap<String,String>();
 
                 try{
@@ -107,6 +114,12 @@ public class AddEventoActivity extends AppCompatActivity {
                     }, params, AddEventoActivity.this);
                     RequestQueue rq = VolleySingleton.getInstance(AddEventoActivity.this).getRequestQueue();
                     rq.add(sr);
+                    rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                        @Override
+                        public void onRequestFinished(Request<Object> request) {
+                            pd.close();
+                        }
+                    });
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }

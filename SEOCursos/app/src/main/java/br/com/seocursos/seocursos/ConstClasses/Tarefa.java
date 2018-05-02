@@ -7,11 +7,11 @@ import java.sql.Date;
  */
 
 public class Tarefa {
-    private Integer id,idDisciplina,idTutor;
-    private String descricao,disciplina,tutor;
+    private Integer idDisciplina,idTutor;
+    private String id,descricao,disciplina,tutor;
     private String dataEnvio;
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
@@ -39,7 +39,7 @@ public class Tarefa {
         return dataEnvio;
     }
 
-    public Tarefa(Integer id, String descricao, String dataEnvio, Integer idDisciplina, Integer idTutor, String disciplina, String tutor){
+    public Tarefa(String id, String descricao, String dataEnvio, Integer idDisciplina, Integer idTutor, String disciplina, String tutor){
         this.id = id;
         this.descricao = descricao;
         this.dataEnvio = dataEnvio;

@@ -11,11 +11,11 @@ import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,6 +26,7 @@ import java.util.Map;
 
 import br.com.jansenfelipe.androidmask.MaskEditTextChangedListener;
 import br.com.seocursos.seocursos.Outros.CRUD;
+import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 import br.com.seocursos.seocursos.Outros.ValidaCPF;
 
 public class EditUsuarioActivity extends AppCompatActivity {
@@ -36,10 +37,15 @@ public class EditUsuarioActivity extends AppCompatActivity {
     RadioGroup sexo, modalidade;
     Button btn;
 
+    ProgressDialogHelper pd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_usuario);
+        setContentView(R.layout.activity_edit_usuario);
+
+        pd = new ProgressDialogHelper(EditUsuarioActivity.this);
+
         //Recupera os elementos pelo ID
         nome = (TextInputEditText) findViewById(R.id.nomeUsuario);
         senha = (TextInputEditText) findViewById(R.id.senhaUsuario);
@@ -80,6 +86,7 @@ public class EditUsuarioActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                pd.open();
                 if((!senha.getText().toString().isEmpty()) && (senha.getText().toString().equals(confSenha.getText().toString()))) {
                     final Map<String, String> params = new HashMap<String, String>();
 
@@ -127,7 +134,12 @@ public class EditUsuarioActivity extends AppCompatActivity {
                     }, params, getApplicationContext());
                     RequestQueue rq = VolleySingleton.getInstance(EditUsuarioActivity.this).getRequestQueue();
                     rq.add(sr);
-
+                    rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                        @Override
+                        public void onRequestFinished(Request<Object> request) {
+                            pd.close();
+                        }
+                    });
                 }else{
                     Toast.makeText(EditUsuarioActivity.this, "Preencha as senhas corretamente!", Toast.LENGTH_SHORT).show();
                 }
@@ -138,6 +150,7 @@ public class EditUsuarioActivity extends AppCompatActivity {
             @Override
             public void onFocusChange(View view, boolean b) {
                 if (!b) {
+                    pd.open();
                     String sendCpf = cpf.getText().toString();
                     sendCpf = sendCpf.replace(".", "");
                     sendCpf = sendCpf.replace("-", "");
@@ -152,6 +165,7 @@ public class EditUsuarioActivity extends AppCompatActivity {
                         btn.setBackgroundColor(getResources().getColor(R.color.blueAccent2));
                         btn.setTextColor(getResources().getColor(R.color.white));
                     }
+                    pd.close();
                 }
             }
         });
@@ -159,6 +173,7 @@ public class EditUsuarioActivity extends AppCompatActivity {
             @Override
             public void onFocusChange(View view, boolean b) {
                 if (!b) {
+                    pd.open();
                     String sendCep = cep.getText().toString();
                     sendCep = sendCep.replace(".", "");
                     sendCep = sendCep.replace("-", "");
@@ -192,48 +207,63 @@ public class EditUsuarioActivity extends AppCompatActivity {
                     });
                     RequestQueue rq = VolleySingleton.getInstance(EditUsuarioActivity.this).getRequestQueue();
                     rq.add(sr);
+                    rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                        @Override
+                        public void onRequestFinished(Request<Object> request) {
+                            pd.close();
+                        }
+                    });
                 }
             }
         });
     }
     public void carregar(){
+        pd.open();
         StringRequest sr = CRUD.selecionarEditar(JSON_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
                     JSONObject jo = new JSONObject(response);
-                    JSONArray ja = jo.getJSONArray("usuario");
-                    JSONObject objeto = ja.getJSONObject(0);
+                    boolean recebido = jo.getBoolean("resposta");
+                    if(recebido) {
+                        JSONArray ja = jo.getJSONArray("usuario");
+                        JSONObject objeto = ja.getJSONObject(0);
 
-                    String idO=objeto.getString("id_usuario"),numeroO=objeto.getString("numero");
-                    String nomeO=objeto.getString("nome"),emailO=objeto.getString("email"),
-                            fotoO=objeto.getString("foto"),cpfO=objeto.getString("cpf"),
-                            cepO=objeto.getString("cep"),enderecoO=objeto.getString("endereco"),
-                            cidadeO=objeto.getString("cidade"),estadoO=objeto.getString("estado"),
-                            sexoO=objeto.getString("sexo"),tipoUsuarioO=objeto.getString("tipo_usuario");
-                    String telefoneO=objeto.getString("telefone"),modalidadeO=objeto.getString("id_modalidade");
+                        String idO = objeto.getString("id_usuario"), numeroO = objeto.getString("numero");
+                        String nomeO = objeto.getString("nome"), emailO = objeto.getString("email"),
+                                fotoO = objeto.getString("foto"), cpfO = objeto.getString("cpf"),
+                                cepO = objeto.getString("cep"), enderecoO = objeto.getString("endereco"),
+                                cidadeO = objeto.getString("cidade"), estadoO = objeto.getString("estado"),
+                                sexoO = objeto.getString("sexo"), tipoUsuarioO = objeto.getString("tipo_usuario");
+                        String telefoneO = objeto.getString("telefone"), modalidadeO = objeto.getString("id_modalidade");
 
-                    nome.setText(nomeO);
-                    email.setText(emailO);
-                    cpf.setText(cpfO);
-                    cep.setText(cepO);
-                    endereco.setText(enderecoO);
-                    numero.setText(numeroO);
-                    cidade.setText(cidadeO);
-                    estado.setText(estadoO);
-                    telefone.setText(telefoneO);
+                        nome.setText(nomeO);
+                        email.setText(emailO);
+                        cpf.setText(cpfO);
+                        cep.setText(cepO);
+                        endereco.setText(enderecoO);
+                        numero.setText(numeroO);
+                        cidade.setText(cidadeO);
+                        estado.setText(estadoO);
+                        telefone.setText(telefoneO);
 
-                    if(sexoO.equals("M")){
-                        sexo.check(R.id.masculinoUsuario);
+                        if (sexoO.equals("M")) {
+                            sexo.check(R.id.masculinoUsuario);
+                        } else {
+                            sexo.check(R.id.femininoUsuario);
+                        }
+                        if (modalidadeO.equals("1")) {
+                            modalidade.check(R.id.semipresencialUsuario);
+                        } else {
+                            modalidade.check(R.id.eadUsuario);
+                        }
                     }else{
-                        sexo.check(R.id.femininoUsuario);
+                        String error = jo.getString("error");
+                        Toast.makeText(EditUsuarioActivity.this, error, Toast.LENGTH_SHORT).show();
+                        Intent i = new Intent(EditUsuarioActivity.this, UsuariosActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(i);
                     }
-                    if(modalidadeO.equals("1")){
-                        modalidade.check(R.id.semipresencialUsuario);
-                    }else{
-                        modalidade.check(R.id.eadUsuario);
-                    }
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -241,5 +271,11 @@ public class EditUsuarioActivity extends AppCompatActivity {
         }, getApplicationContext(), id);
         RequestQueue rq = VolleySingleton.getInstance(EditUsuarioActivity.this).getRequestQueue();
         rq.add(sr);
+        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+            @Override
+            public void onRequestFinished(Request<Object> request) {
+                pd.close();
+            }
+        });
     }
 }

@@ -19,14 +19,11 @@ import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,8 +35,8 @@ import java.util.List;
 import java.util.Map;
 
 import br.com.seocursos.seocursos.ConstClasses.Disciplina;
-import br.com.seocursos.seocursos.ConstClasses.Tarefa;
 import br.com.seocursos.seocursos.Outros.CRUD;
+import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class DisciplinasActivity extends AppCompatActivity implements SearchView.OnQueryTextListener{
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/disciplinas.php";
@@ -48,10 +45,14 @@ public class DisciplinasActivity extends AppCompatActivity implements SearchView
     FloatingActionButton fab;
     SearchView sv;
 
+    ProgressDialogHelper pd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_disciplinas);
+
+        pd = new ProgressDialogHelper(DisciplinasActivity.this);
 
         lvDisciplinas = (ListView)findViewById(R.id.lvDisciplinas);
         lista = new ArrayList<Disciplina>();
@@ -63,6 +64,12 @@ public class DisciplinasActivity extends AppCompatActivity implements SearchView
             public void onClick(View view) {
                 Intent i = new Intent(DisciplinasActivity.this, AddDisciplinaActivity.class);
                 startActivity(i);
+            }
+        });
+        lvDisciplinas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                view.performLongClick();
             }
         });
 
@@ -132,6 +139,7 @@ public class DisciplinasActivity extends AppCompatActivity implements SearchView
     }
 
     public void carregar(){
+        pd.open();
         //Requisição à página por método POST
         StringRequest sr = CRUD.selecionar(JSON_URL,
                 new Response.Listener<String>() {
@@ -166,6 +174,12 @@ public class DisciplinasActivity extends AppCompatActivity implements SearchView
         //Adiciona a requisição à fila
         RequestQueue rq = VolleySingleton.getInstance(DisciplinasActivity.this).getRequestQueue();
         rq.add(sr);
+        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+            @Override
+            public void onRequestFinished(Request<Object> request) {
+                pd.close();
+            }
+        });
     }
     //Classe interna para criar o adapter da classe externa
     class ListViewAdapter extends ArrayAdapter<Disciplina> {

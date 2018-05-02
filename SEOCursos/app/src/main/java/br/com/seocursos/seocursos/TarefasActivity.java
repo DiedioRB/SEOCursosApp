@@ -24,9 +24,7 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,8 +36,8 @@ import java.util.List;
 import java.util.Map;
 
 import br.com.seocursos.seocursos.ConstClasses.Tarefa;
-import br.com.seocursos.seocursos.ConstClasses.Usuario;
 import br.com.seocursos.seocursos.Outros.CRUD;
+import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class TarefasActivity extends AppCompatActivity implements SearchView.OnQueryTextListener{
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/tarefas.php";
@@ -48,23 +46,57 @@ public class TarefasActivity extends AppCompatActivity implements SearchView.OnQ
     FloatingActionButton fab;
     SearchView sv;
 
+    ProgressDialogHelper pd;
+    SharedPreferencesHelper helper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tarefas);
 
+        pd = new ProgressDialogHelper(TarefasActivity.this);
+        helper = new SharedPreferencesHelper(TarefasActivity.this);
+
         lvTarefas = (ListView)findViewById(R.id.lvTarefas);
         lista = new ArrayList<Tarefa>();
-        registerForContextMenu(lvTarefas);
         fab = findViewById(R.id.fabTarefas);
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(TarefasActivity.this, AddTarefaActivity.class);
-                startActivity(i);
+        if(!helper.getString("privilegio").equals("A")) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent i = new Intent(TarefasActivity.this, AddTarefaActivity.class);
+                    startActivity(i);
+                }
+            });
+            if(helper.getString("privilegio").equals("D")){
+                registerForContextMenu(lvTarefas);
+                lvTarefas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        view.performLongClick();
+                    }
+                });
             }
-        });
+        }else{
+            fab.setVisibility(View.GONE);
+            lvTarefas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(TarefasActivity.this);
+                    builder.setCancelable(true);
+                    builder.setTitle("Responder tarefa");
+                    builder.setMessage("Deseja responder a essa tarefa?");
+                    builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Tarefa tarefa = lista.get(i);
+                            //TODO: terminar essa bagaça
+                        }
+                    }).setNegativeButton("Não", null);
+                }
+            });
+        }
 
         lvTarefas.setTextFilterEnabled(true);
         sv = findViewById(R.id.svTarefas);
@@ -100,8 +132,8 @@ public class TarefasActivity extends AppCompatActivity implements SearchView.OnQ
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         Integer pos = info.position;
-        Tarefa tarefa= lista.get(pos);
-        final Integer id = tarefa.getId();
+        Tarefa tarefa = lista.get(pos);
+        final String id = tarefa.getId();
 
         if(item.getTitle() == "Editar"){
             Intent i = new Intent(TarefasActivity.this, EditTarefaActivity.class);
@@ -132,6 +164,7 @@ public class TarefasActivity extends AppCompatActivity implements SearchView.OnQ
     }
 
     public void carregar(){
+        pd.open();
         lista.clear();
         //Requisição à página por método POST
         StringRequest sr = CRUD.selecionar(JSON_URL,new Response.Listener<String>() {
@@ -144,9 +177,9 @@ public class TarefasActivity extends AppCompatActivity implements SearchView.OnQ
                     //Para cada objeto, adiciona na lista
                     for(int i=0;i<ja.length();i++){
                         JSONObject objeto = ja.getJSONObject(i);
-                        Integer id=objeto.getInt("id_tarefa"),idDisciplina=objeto.getInt("id_disciplina"),
+                        Integer idDisciplina=objeto.getInt("id_disciplina"),
                                 idTutor=objeto.getInt("id_usuario");
-                        String descricao=objeto.getString("descricao"),disciplina=objeto.getString("disciplina"),
+                        String id=objeto.getString("id_tarefa"),descricao=objeto.getString("descricao"),disciplina=objeto.getString("disciplina"),
                                 tutor=objeto.getString("tutor");
                         String dataEnvio=objeto.getString("data_envio");
 
@@ -165,6 +198,12 @@ public class TarefasActivity extends AppCompatActivity implements SearchView.OnQ
         //Adiciona a requisição à fila
         RequestQueue rq = VolleySingleton.getInstance(TarefasActivity.this).getRequestQueue();
         rq.add(sr);
+        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+            @Override
+            public void onRequestFinished(Request<Object> request) {
+                pd.close();
+            }
+        });
     }
 
     //Classe interna para criar o adapter da classe externa

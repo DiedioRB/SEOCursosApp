@@ -5,16 +5,15 @@ import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,6 +25,7 @@ import java.util.Map;
 
 import br.com.seocursos.seocursos.ConstClasses.Disciplina;
 import br.com.seocursos.seocursos.Outros.CRUD;
+import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class AddTarefaActivity extends AppCompatActivity {
     private final static String JSON_URL = "https://www.seocursos.com.br/PHP/Android/tarefas.php";
@@ -37,10 +37,14 @@ public class AddTarefaActivity extends AppCompatActivity {
     ArrayAdapter<String> adapter;
     String idDisciplina;
 
+    ProgressDialogHelper pd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_tarefa);
+
+        pd = new ProgressDialogHelper(AddTarefaActivity.this);
 
         descricao = findViewById(R.id.descricao);
         spinner = findViewById(R.id.disciplinas);
@@ -53,13 +57,14 @@ public class AddTarefaActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                pd.open();
                 Map<String,String> params = new HashMap<String, String>();
                 params.put("descricao", descricao.getText().toString());
 
                 Disciplina disciplina = listaDisciplinas.get(spinner.getSelectedItemPosition());
                 idDisciplina = disciplina.getId();
                 params.put("id_disciplina", idDisciplina);
-                SharedPreferencesSingleton preferences = SharedPreferencesSingleton.getInstance(AddTarefaActivity.this);
+                SharedPreferencesHelper preferences = new SharedPreferencesHelper(AddTarefaActivity.this);
                 String idUsuario = preferences.getString("id");
                 params.put("id_usuario", idUsuario);
 
@@ -84,6 +89,12 @@ public class AddTarefaActivity extends AppCompatActivity {
                 },params,AddTarefaActivity.this);
                 RequestQueue rq = VolleySingleton.getInstance(AddTarefaActivity.this).getRequestQueue();
                 rq.add(sr);
+                rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                    @Override
+                    public void onRequestFinished(Request<Object> request) {
+                        pd.close();
+                    }
+                });
             }
         });
 
@@ -115,6 +126,11 @@ public class AddTarefaActivity extends AppCompatActivity {
         }, AddTarefaActivity.this);
         RequestQueue rq = VolleySingleton.getInstance(AddTarefaActivity.this).getRequestQueue();
         rq.add(sr);
-
+        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+            @Override
+            public void onRequestFinished(Request<Object> request) {
+                pd.close();
+            }
+        });
     }
 }

@@ -4,12 +4,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.LruCache;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -23,12 +21,12 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,6 +39,7 @@ import java.util.Map;
 
 import br.com.seocursos.seocursos.ConstClasses.Usuario;
 import br.com.seocursos.seocursos.Outros.CRUD;
+import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class UsuariosActivity extends AppCompatActivity implements SearchView.OnQueryTextListener{
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/usuarios.php";
@@ -50,17 +49,26 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
     SearchView sv;
 
     RequestQueue rq;
+    ProgressDialogHelper pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_usuarios);
 
+        pd = new ProgressDialogHelper(UsuariosActivity.this);
+
         lvUsuarios = (ListView)findViewById(R.id.lvUsuarios);
         lista = new ArrayList<Usuario>();
         fab = (FloatingActionButton)findViewById(R.id.fabUsuarios);
 
         rq = VolleySingleton.getInstance(UsuariosActivity.this).getRequestQueue();
+        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+            @Override
+            public void onRequestFinished(Request<Object> request) {
+                pd.close();
+            }
+        });
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,6 +76,12 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
                 Intent i = new Intent(UsuariosActivity.this, AddUsuarioActivity.class);
                 i.putExtra("toLogin", false);
                 startActivity(i);
+            }
+        });
+        lvUsuarios.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                view.performLongClick();
             }
         });
         registerForContextMenu(lvUsuarios);
@@ -112,7 +126,8 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
         if(item.getTitle() == "Editar"){
             Intent i = new Intent(UsuariosActivity.this, EditUsuarioActivity.class);
             i.putExtra("id", id);
-            startActivity(i);
+            //startActivity(i);
+            Toast.makeText(this, lista.get(pos).getNome(), Toast.LENGTH_SHORT).show();
         }
         if(item.getTitle() == "Excluir"){
             AlertDialog.Builder builder = new AlertDialog.Builder(UsuariosActivity.this);
@@ -138,6 +153,7 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
     }
 
     public void carregar(){
+        pd.open();
         //Limpa a lista antes de enchê-la
         lista.clear();
         //Requisição à página por método POST
@@ -248,6 +264,7 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
             foto.setImageUrl("https://www.seocursos.com.br/Imagens/Login/"+usuario.getFoto(),il);
             titulo.setText(usuario.getNome().toString());
             subtitulo.setText(usuario.getEmail().toString());
+
             //Retorna a View (Item)
             return listViewItem;
         }

@@ -3,14 +3,16 @@ package br.com.seocursos.seocursos;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.Map;
+
 /**
  * Created by Aluno on 13/04/2018.
  */
 
-class SharedPreferencesSingleton {
+class SharedPreferencesHelper {
     public static final String PREFS_NAME = "SEOPreferences";
 
-    private static SharedPreferencesSingleton instance;
+    private static SharedPreferencesHelper instance;
     private static Context contexto;
 
     private static SharedPreferences preferences;
@@ -19,16 +21,9 @@ class SharedPreferencesSingleton {
         return preferences;
     }
 
-    static SharedPreferencesSingleton getInstance(Context contexto) {
-        if(instance == null){
-            instance = new SharedPreferencesSingleton(contexto);
-        }
-        return instance;
-    }
-
-    private SharedPreferencesSingleton(Context context) {
-        contexto = context;
-        preferences = context.getSharedPreferences(PREFS_NAME, 0);
+    public SharedPreferencesHelper(Context contexto) {
+        this.contexto = contexto;
+        preferences = contexto.getSharedPreferences(PREFS_NAME, 0);
     }
 
     private SharedPreferences.Editor getEditor(){

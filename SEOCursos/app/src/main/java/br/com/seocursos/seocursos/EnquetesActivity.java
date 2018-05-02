@@ -19,12 +19,11 @@ import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,8 +35,8 @@ import java.util.List;
 import java.util.Map;
 
 import br.com.seocursos.seocursos.ConstClasses.Enquete;
-import br.com.seocursos.seocursos.ConstClasses.Evento;
 import br.com.seocursos.seocursos.Outros.CRUD;
+import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class EnquetesActivity extends AppCompatActivity implements SearchView.OnQueryTextListener{
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/enquetes.php";
@@ -46,23 +45,41 @@ public class EnquetesActivity extends AppCompatActivity implements SearchView.On
     FloatingActionButton fab;
     SearchView sv;
 
+    ProgressDialogHelper pd;
+    SharedPreferencesHelper helper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_eventos);
+        setContentView(R.layout.activity_enquetes);
+
+        pd = new ProgressDialogHelper(EnquetesActivity.this);
+        helper = new SharedPreferencesHelper(EnquetesActivity.this);
 
         lv = (ListView) findViewById(R.id.lv);
         lista = new ArrayList<Enquete>();
-        registerForContextMenu(lv);
         fab = findViewById(R.id.fab);
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(EnquetesActivity.this, AddEnqueteActivity.class);
-                startActivity(i);
+        if(!helper.getString("privilegio").equals("A")) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent i = new Intent(EnquetesActivity.this, AddEnqueteActivity.class);
+                    startActivity(i);
+                }
+            });
+            if(helper.getString("privilegio").equals("D")) {
+                registerForContextMenu(lv);
+                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        view.performLongClick();
+                    }
+                });
             }
-        });
+        }else{
+            fab.setVisibility(View.GONE);
+        }
 
         lv.setTextFilterEnabled(true);
         sv = findViewById(R.id.sv);
@@ -129,6 +146,7 @@ public class EnquetesActivity extends AppCompatActivity implements SearchView.On
         return true;
     }
     public void carregar(){
+        pd.open();
         lista.clear();
         //Requisição à página por método POST
         StringRequest sr = CRUD.selecionar(JSON_URL,new Response.Listener<String>() {
@@ -161,6 +179,12 @@ public class EnquetesActivity extends AppCompatActivity implements SearchView.On
         //Adiciona a requisição à fila
         RequestQueue rq = VolleySingleton.getInstance(EnquetesActivity.this).getRequestQueue();
         rq.add(sr);
+        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+            @Override
+            public void onRequestFinished(Request<Object> request) {
+                pd.close();
+            }
+        });
     }
 
     //Classe interna para criar o adapter da classe externa

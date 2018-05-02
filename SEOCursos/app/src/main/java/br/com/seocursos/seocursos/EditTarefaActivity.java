@@ -5,12 +5,12 @@ import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
@@ -25,6 +25,7 @@ import java.util.Map;
 
 import br.com.seocursos.seocursos.ConstClasses.Disciplina;
 import br.com.seocursos.seocursos.Outros.CRUD;
+import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class EditTarefaActivity extends AppCompatActivity {
     private final static String JSON_URL = "https://www.seocursos.com.br/PHP/Android/tarefas.php";
@@ -37,10 +38,14 @@ public class EditTarefaActivity extends AppCompatActivity {
     ArrayAdapter<String> adapter;
     String idDisciplina;
 
+    ProgressDialogHelper pd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_tarefa);
+
+        pd = new ProgressDialogHelper(EditTarefaActivity.this);
 
         Intent intent = getIntent();
         try {
@@ -64,16 +69,16 @@ public class EditTarefaActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                pd.open();
                 Map<String,String> params = new HashMap<String, String>();
                 params.put("descricao", descricao.getText().toString());
 
                 Disciplina disciplina = listaDisciplinas.get(spinner.getSelectedItemPosition());
                 idDisciplina = disciplina.getId();
                 params.put("id_disciplina", idDisciplina);
-                SharedPreferencesSingleton preferences = SharedPreferencesSingleton.getInstance(EditTarefaActivity.this);
+                SharedPreferencesHelper preferences = new SharedPreferencesHelper(EditTarefaActivity.this);
                 String idUsuario = preferences.getString("id");
                 params.put("id_usuario", idUsuario);
-                //TODO: depois do login, recuperar id do usuário
 
                 StringRequest sr = CRUD.editar(JSON_URL, new Response.Listener<String>() {
                     @Override
@@ -96,6 +101,12 @@ public class EditTarefaActivity extends AppCompatActivity {
                 },params,EditTarefaActivity.this);
                 RequestQueue rq = VolleySingleton.getInstance(EditTarefaActivity.this).getRequestQueue();
                 rq.add(sr);
+                rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                    @Override
+                    public void onRequestFinished(Request<Object> request) {
+                        pd.close();
+                    }
+                });
             }
         });
 
@@ -104,8 +115,15 @@ public class EditTarefaActivity extends AppCompatActivity {
         spinner.setAdapter(adapter);
     }
     public void carregar(){
+        pd.open();
         String cursosURL = "https://www.seocursos.com.br/PHP/Android/disciplinas.php";
         RequestQueue rq = VolleySingleton.getInstance(EditTarefaActivity.this).getRequestQueue();
+        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+            @Override
+            public void onRequestFinished(Request<Object> request) {
+                pd.close();
+            }
+        });
 
         StringRequest cursosRequest = CRUD.selecionar(cursosURL, new Response.Listener<String>() {
             @Override

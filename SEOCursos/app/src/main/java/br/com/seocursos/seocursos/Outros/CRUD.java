@@ -38,7 +38,7 @@ public class CRUD {
             }
         };
         return sr;
-    };
+    }
 
     //Selecionar
     public static StringRequest selecionar(String url, Response.Listener<String> responseListener, final Context contexto){

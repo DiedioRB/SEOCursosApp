@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import br.com.seocursos.seocursos.Outros.CRUD;
+import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class AddCursoActivity extends AppCompatActivity {
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/cursos.php";
@@ -28,10 +29,14 @@ public class AddCursoActivity extends AppCompatActivity {
     RadioGroup tipo;
     Button btn;
 
+    ProgressDialogHelper pd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_curso);
+
+        pd = new ProgressDialogHelper(AddCursoActivity.this);
 
         nome = findViewById(R.id.nome);
         area = findViewById(R.id.area);
@@ -45,6 +50,7 @@ public class AddCursoActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                pd.open();
                 Map<String,String> params = new HashMap<String,String>();
 
                 params.put("nome", nome.getText().toString());
@@ -95,6 +101,12 @@ public class AddCursoActivity extends AppCompatActivity {
                 },params, AddCursoActivity.this);
                 RequestQueue rq = VolleySingleton.getInstance(AddCursoActivity.this).getRequestQueue();
                 rq.add(sr);
+                rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                    @Override
+                    public void onRequestFinished(Request<Object> request) {
+                        pd.close();
+                    }
+                });
             }
         });
     }
