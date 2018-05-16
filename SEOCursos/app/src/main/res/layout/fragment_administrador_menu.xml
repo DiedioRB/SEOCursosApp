@@ -113,6 +113,42 @@
 
         </RelativeLayout>
     </android.support.v7.widget.CardView>
+    <android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_margin="8dp"
+        android:onClick="graficos">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackground"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/cvImage4"
+                android:layout_width="70dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="18dp"
+                android:layout_marginEnd="18dp"
+                android:src="@drawable/ic_timeline" />
+
+            <TextView
+                android:id="@+id/cvTitulo4"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/cvImage4"
+                android:layout_toEndOf="@+id/cvImage4"
+                android:paddingBottom="5dp"
+                android:textColor="@color/darkGrey"
+                android:text="@string/graficos"
+                android:textSize="30sp" />
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
 
 
 </LinearLayout>

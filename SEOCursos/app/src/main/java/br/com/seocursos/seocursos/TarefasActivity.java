@@ -36,13 +36,15 @@ import java.util.List;
 import java.util.Map;
 
 import br.com.seocursos.seocursos.ConstClasses.Tarefa;
+import br.com.seocursos.seocursos.ConstClasses.Usuario;
 import br.com.seocursos.seocursos.Outros.CRUD;
 import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class TarefasActivity extends AppCompatActivity implements SearchView.OnQueryTextListener{
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/tarefas.php";
     ListView lvTarefas;
-    ArrayList<Tarefa> lista;
+    List<Tarefa> lista;
+    List<Tarefa> listaQuery;
     FloatingActionButton fab;
     SearchView sv;
 
@@ -59,6 +61,7 @@ public class TarefasActivity extends AppCompatActivity implements SearchView.OnQ
 
         lvTarefas = (ListView)findViewById(R.id.lvTarefas);
         lista = new ArrayList<Tarefa>();
+        listaQuery = new ArrayList<Tarefa>();
         fab = findViewById(R.id.fabTarefas);
 
         if(!helper.getString("privilegio").equals("A")) {
@@ -67,6 +70,14 @@ public class TarefasActivity extends AppCompatActivity implements SearchView.OnQ
                 public void onClick(View view) {
                     Intent i = new Intent(TarefasActivity.this, AddTarefaActivity.class);
                     startActivity(i);
+                }
+            });
+            lvTarefas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    //       Intent i = new Intent(TarefasActivity.this, RespostasActivity.class);
+                    //       i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    //       startActivity(i);
                 }
             });
             if(helper.getString("privilegio").equals("D")){
@@ -82,18 +93,22 @@ public class TarefasActivity extends AppCompatActivity implements SearchView.OnQ
             fab.setVisibility(View.GONE);
             lvTarefas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(TarefasActivity.this);
                     builder.setCancelable(true);
                     builder.setTitle("Responder tarefa");
                     builder.setMessage("Deseja responder a essa tarefa?");
                     builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
+                        public void onClick(DialogInterface dialogInterface, int in) {
                             Tarefa tarefa = lista.get(i);
-                            //TODO: terminar essa bagaça
+                            String id = tarefa.getId();
+                            Intent intent = new Intent(TarefasActivity.this, RespostaTarefaActivity.class);
+                            intent.putExtra("id", id);
+                            startActivity(intent);
                         }
                     }).setNegativeButton("Não", null);
+                    builder.create().show();
                 }
             });
         }
@@ -107,11 +122,18 @@ public class TarefasActivity extends AppCompatActivity implements SearchView.OnQ
 
     @Override
     public boolean onQueryTextChange(String newText){
+        listaQuery.clear();
         if (TextUtils.isEmpty(newText)) {
-            lvTarefas.clearTextFilter();
+            listaQuery.addAll(lista);
         } else {
-            lvTarefas.setFilterText(newText);
+            String queryText = newText.toLowerCase();
+            for(Tarefa u : lista){
+                if(u.getDescricao().toLowerCase().contains(queryText)){
+                    listaQuery.add(u);
+                }
+            }
         }
+        lvTarefas.setAdapter(new TarefasActivity.ListViewAdapter(listaQuery, TarefasActivity.this));
         return true;
     }
 
@@ -132,7 +154,7 @@ public class TarefasActivity extends AppCompatActivity implements SearchView.OnQ
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         Integer pos = info.position;
-        Tarefa tarefa = lista.get(pos);
+        Tarefa tarefa = listaQuery.get(pos);
         final String id = tarefa.getId();
 
         if(item.getTitle() == "Editar"){
@@ -185,6 +207,7 @@ public class TarefasActivity extends AppCompatActivity implements SearchView.OnQ
 
                         Tarefa tarefa = new Tarefa(id, descricao, dataEnvio, idDisciplina, idTutor, disciplina, tutor);
                         lista.add(tarefa);
+                        listaQuery.add(tarefa);
                     }
                     //Cria um adapter para a lista
                     ListViewAdapter adapter = new ListViewAdapter(lista, getApplicationContext());
@@ -211,7 +234,6 @@ public class TarefasActivity extends AppCompatActivity implements SearchView.OnQ
         //Lista com os adapter e contexto do aplicativo
         private List<Tarefa> lista;
         private Context contexto;
-        private List<Tarefa> orig;
 
         //Método construtor
         private ListViewAdapter(List<Tarefa> lista, Context contexto){
@@ -220,45 +242,6 @@ public class TarefasActivity extends AppCompatActivity implements SearchView.OnQ
 
             this.lista = lista;
             this.contexto = contexto;
-        }
-
-        @Override
-        public int getCount() {
-            return lista.size();
-        }
-
-        @Override
-        public Filter getFilter() {
-            return new Filter() {
-                @Override
-                protected FilterResults performFiltering(CharSequence constraint) {
-                    final FilterResults oReturn = new FilterResults();
-                    final ArrayList<Tarefa> results = new ArrayList<Tarefa>();
-                    if (orig == null) {
-                        orig = lista;
-                    }
-                    if (constraint != null) {
-                        if (orig != null && orig.size() > 0) {
-                            for (final Tarefa g : orig) {
-                                if ((g.getDescricao().toLowerCase().contains(constraint.toString())) ||
-                                        (g.getDisciplina().toLowerCase().contains(constraint.toString())) ||
-                                        (g.getTutor().toLowerCase().contains(constraint.toString()))) {
-                                    results.add(g);
-                                }
-                            }
-                        }
-                        oReturn.values = results;
-                    }
-                    return oReturn;
-                }
-
-                @SuppressWarnings("unchecked")
-                @Override
-                protected void publishResults(CharSequence constraint, FilterResults results) {
-                    lista = (ArrayList<Tarefa>) results.values;
-                    notifyDataSetChanged();
-                }
-            };
         }
 
         //Método que retorna o item para o ListView

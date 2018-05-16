@@ -5,15 +5,14 @@ package br.com.seocursos.seocursos.ConstClasses;
  */
 
 public class Curso{
-    private Integer cargaHoraria;
-    private String id, nome, area, preRequisito, descricao, tipo;
+    private String id, nome, area, preRequisito, descricao, tipo, cargaHoraria;
     private Double preco;
 
     public String getId() {
         return id;
     }
 
-    public Integer getCargaHoraria() {
+    public String getCargaHoraria() {
         return cargaHoraria;
     }
 
@@ -41,7 +40,7 @@ public class Curso{
         return preco;
     }
 
-    public Curso(String id, String nome, Double preco, String area, Integer cargaHoraria, String preRequisito, String descricao, String tipo){
+    public Curso(String id, String nome, Double preco, String area, String cargaHoraria, String preRequisito, String descricao, String tipo){
         this.id = id;
         this.nome = nome;
         this.preco = preco;

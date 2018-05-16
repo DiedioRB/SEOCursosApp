@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import br.com.seocursos.seocursos.ConstClasses.Disciplina;
+import br.com.seocursos.seocursos.ConstClasses.Usuario;
 import br.com.seocursos.seocursos.Outros.CRUD;
 import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
@@ -42,6 +43,7 @@ public class DisciplinasActivity extends AppCompatActivity implements SearchView
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/disciplinas.php";
     ListView lvDisciplinas;
     List<Disciplina> lista;
+    List<Disciplina> listaQuery;
     FloatingActionButton fab;
     SearchView sv;
 
@@ -56,6 +58,7 @@ public class DisciplinasActivity extends AppCompatActivity implements SearchView
 
         lvDisciplinas = (ListView)findViewById(R.id.lvDisciplinas);
         lista = new ArrayList<Disciplina>();
+        listaQuery = new ArrayList<Disciplina>();
         registerForContextMenu(lvDisciplinas);
 
         fab = findViewById(R.id.fabDisciplinas);
@@ -79,14 +82,21 @@ public class DisciplinasActivity extends AppCompatActivity implements SearchView
 
         carregar();
     }
-
     @Override
     public boolean onQueryTextChange(String newText){
+        listaQuery.clear();
         if (TextUtils.isEmpty(newText)) {
-            lvDisciplinas.clearTextFilter();
+            listaQuery.addAll(lista);
         } else {
-            lvDisciplinas.setFilterText(newText);
+            String queryText = newText.toLowerCase();
+            for(Disciplina u : lista){
+                if(u.getNome().toLowerCase().contains(queryText) ||
+                        u.getArea().toLowerCase().contains(queryText)){
+                    listaQuery.add(u);
+                }
+            }
         }
+        lvDisciplinas.setAdapter(new DisciplinasActivity.ListViewAdapter(listaQuery, DisciplinasActivity.this));
         return true;
     }
 
@@ -107,7 +117,7 @@ public class DisciplinasActivity extends AppCompatActivity implements SearchView
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         Integer pos = info.position;
-        Disciplina disciplina = lista.get(pos);
+        Disciplina disciplina = listaQuery.get(pos);
         final String id = disciplina.getId();
 
         if(item.getTitle() == "Editar"){
@@ -161,6 +171,7 @@ public class DisciplinasActivity extends AppCompatActivity implements SearchView
 
                                 Disciplina disciplina = new Disciplina(id, nome, nivel, cargaHoraria, area, duracao, modalidade, idCurso, curso);
                                 lista.add(disciplina);
+                                listaQuery.add(disciplina);
                             }
                             //Cria um adapter para a lista
                             ListViewAdapter adapter = new ListViewAdapter(lista, getApplicationContext());
@@ -186,7 +197,6 @@ public class DisciplinasActivity extends AppCompatActivity implements SearchView
         //Lista com os adapter e contexto do aplicativo
         private List<Disciplina> lista;
         private Context contexto;
-        private List<Disciplina> orig;
 
         //Método construtor
         private ListViewAdapter(List<Disciplina> lista, Context contexto){
@@ -195,44 +205,6 @@ public class DisciplinasActivity extends AppCompatActivity implements SearchView
 
             this.lista = lista;
             this.contexto = contexto;
-        }
-
-        @Override
-        public int getCount() {
-            return lista.size();
-        }
-
-        @Override
-        public Filter getFilter() {
-            return new Filter() {
-                @Override
-                protected FilterResults performFiltering(CharSequence constraint) {
-                    final FilterResults oReturn = new FilterResults();
-                    final ArrayList<Disciplina> results = new ArrayList<Disciplina>();
-                    if (orig == null) {
-                        orig = lista;
-                    }
-                    if (constraint != null) {
-                        if (orig != null && orig.size() > 0) {
-                            for (final Disciplina g : orig) {
-                                if ((g.getNome().toLowerCase().contains(constraint.toString())) ||
-                                        (g.getCurso().toLowerCase().contains(constraint.toString()))) {
-                                    results.add(g);
-                                }
-                            }
-                        }
-                        oReturn.values = results;
-                    }
-                    return oReturn;
-                }
-
-                @SuppressWarnings("unchecked")
-                @Override
-                protected void publishResults(CharSequence constraint, FilterResults results) {
-                    lista = (ArrayList<Disciplina>) results.values;
-                    notifyDataSetChanged();
-                }
-            };
         }
 
         //Método que retorna o item para o ListView

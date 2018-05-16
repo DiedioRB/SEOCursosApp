@@ -100,20 +100,14 @@ public class AddUsuarioActivity extends AppCompatActivity {
                 params.put("estado", estado.getText().toString());
                 params.put("tel", telefone.getText().toString());
 
-                String sexoS,modalidadeS;
+                String sexoS;
                 if(sexo.getCheckedRadioButtonId() == R.id.masculinoUsuario){
                     sexoS = "M";
                 }else{
                     sexoS = "F";
                 }
-                if(modalidade.getCheckedRadioButtonId() == R.id.semipresencialUsuario){
-                    modalidadeS = "1";
-                }else{
-                    modalidadeS = "2";
-                }
 
                 params.put("sexo", sexoS);
-                params.put("modalidade", modalidadeS);
 
                 //Imagens
                 String imagemUsuario = getStringImage(imagem);

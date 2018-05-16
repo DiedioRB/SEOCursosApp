@@ -45,6 +45,7 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/usuarios.php";
     ListView lvUsuarios;
     List<Usuario> lista;
+    List<Usuario> listaQuery;
     FloatingActionButton fab;
     SearchView sv;
 
@@ -60,6 +61,7 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
 
         lvUsuarios = (ListView)findViewById(R.id.lvUsuarios);
         lista = new ArrayList<Usuario>();
+        listaQuery = new ArrayList<Usuario>();
         fab = (FloatingActionButton)findViewById(R.id.fabUsuarios);
 
         rq = VolleySingleton.getInstance(UsuariosActivity.this).getRequestQueue();
@@ -86,7 +88,6 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
         });
         registerForContextMenu(lvUsuarios);
 
-        lvUsuarios.setTextFilterEnabled(true);
         sv = findViewById(R.id.svUsuarios);
         sv.setOnQueryTextListener(this);
 
@@ -94,11 +95,19 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
     }
     @Override
     public boolean onQueryTextChange(String newText){
+        listaQuery.clear();
         if (TextUtils.isEmpty(newText)) {
-            lvUsuarios.clearTextFilter();
+            listaQuery.addAll(lista);
         } else {
-            lvUsuarios.setFilterText(newText);
+            String queryText = newText.toLowerCase();
+            for(Usuario u : lista){
+                if(u.getNome().toLowerCase().contains(queryText) ||
+                        u.getEmail().toLowerCase().contains(queryText)){
+                    listaQuery.add(u);
+                }
+            }
         }
+        lvUsuarios.setAdapter(new ListViewAdapter(listaQuery, UsuariosActivity.this));
         return true;
     }
 
@@ -120,14 +129,13 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         Integer pos = info.position;
-        Usuario usuario = lista.get(pos);
+        Usuario usuario = listaQuery.get(pos);
         final String id = usuario.getId();
 
         if(item.getTitle() == "Editar"){
             Intent i = new Intent(UsuariosActivity.this, EditUsuarioActivity.class);
             i.putExtra("id", id);
-            //startActivity(i);
-            Toast.makeText(this, lista.get(pos).getNome(), Toast.LENGTH_SHORT).show();
+            startActivity(i);
         }
         if(item.getTitle() == "Excluir"){
             AlertDialog.Builder builder = new AlertDialog.Builder(UsuariosActivity.this);
@@ -177,6 +185,7 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
                         Usuario usuario = new Usuario(id, nome, email, foto, sexo, tipoUsuario,
                                 cpf, cep, endereco, numero, cidade, estado);
                         lista.add(usuario);
+                        listaQuery.add(usuario);
                     }
                     //Cria um adapter para a lista
                     ListViewAdapter adapter = new ListViewAdapter(lista, getApplicationContext());
@@ -196,7 +205,6 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
         //Lista com os adapter e contexto do aplicativo
         private List<Usuario> lista;
         private Context contexto;
-        private List<Usuario> orig;
 
         //Método construtor
         private ListViewAdapter(List<Usuario> lista, Context contexto){
@@ -205,44 +213,6 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
 
             this.lista = lista;
             this.contexto = contexto;
-        }
-
-        @Override
-        public int getCount() {
-            return lista.size();
-        }
-
-        @Override
-        public Filter getFilter() {
-            return new Filter() {
-                @Override
-                protected FilterResults performFiltering(CharSequence constraint) {
-                    final FilterResults oReturn = new FilterResults();
-                    final ArrayList<Usuario> results = new ArrayList<Usuario>();
-                    if (orig == null) {
-                        orig = lista;
-                    }
-                    if (constraint != null) {
-                        if (orig != null && orig.size() > 0) {
-                            for (final Usuario g : orig) {
-                                if ((g.getNome().toLowerCase().contains(constraint.toString())) ||
-                                        (g.getEmail().toLowerCase().contains(constraint.toString()))) {
-                                    results.add(g);
-                                }
-                            }
-                        }
-                        oReturn.values = results;
-                    }
-                    return oReturn;
-                }
-
-                @SuppressWarnings("unchecked")
-                @Override
-                protected void publishResults(CharSequence constraint, FilterResults results) {
-                    lista = (ArrayList<Usuario>) results.values;
-                    notifyDataSetChanged();
-                }
-            };
         }
 
         //Método que retorna o item para o ListView

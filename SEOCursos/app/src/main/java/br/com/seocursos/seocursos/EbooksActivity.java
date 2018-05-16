@@ -40,11 +40,11 @@ import br.com.seocursos.seocursos.ConstClasses.Usuario;
 import br.com.seocursos.seocursos.Outros.CRUD;
 import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
-public class CursosActivity extends AppCompatActivity implements SearchView.OnQueryTextListener{
-    private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/cursos.php";
-    ListView lvCursos;
-    List<Curso> lista;
-    List<Curso> listaQuery;
+public class EbooksActivity extends AppCompatActivity implements SearchView.OnQueryTextListener{
+    private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/ebooks.php";
+    ListView lv;
+    List<Ebook> lista;
+    List<Ebook> listaQuery;
     FloatingActionButton fab;
     SearchView sv;
 
@@ -54,48 +54,35 @@ public class CursosActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cursos);
+        setContentView(R.layout.activity_ebooks);
 
-        pd = new ProgressDialogHelper(CursosActivity.this);
-        helper = new SharedPreferencesHelper(CursosActivity.this);
+        pd = new ProgressDialogHelper(EbooksActivity.this);
+        helper = new SharedPreferencesHelper(EbooksActivity.this);
 
-        lvCursos = (ListView)findViewById(R.id.lvCursos);
-        lista = new ArrayList<Curso>();
-        listaQuery = new ArrayList<Curso>();
-        fab = findViewById(R.id.fabCursos);
+        lv = (ListView)findViewById(R.id.lv);
+        lista = new ArrayList<Ebook>();
+        listaQuery = new ArrayList<Ebook>();
+        fab = findViewById(R.id.fab);
 
-        if(helper.getString("privilegio").equals("D")) {
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent i = new Intent(CursosActivity.this, AddCursoActivity.class);
-                    startActivity(i);
-                }
-            });
-            registerForContextMenu(lvCursos);
-            lvCursos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    view.performLongClick();
-                }
-            });
-        }else{
-            fab.setVisibility(View.GONE);
-            if(helper.getString("privilegio").equals("A")){
-                lvCursos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        Intent j = new Intent(CursosActivity.this, InfoCursoActivity.class);
-                        Curso curso = lista.get(i);
-                        j.putExtra("id",curso.getId());
-                        j.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(j);
-                    }
-                });
-            }
+        if(helper.getString("privilegio").equals("D")){
+        //    registerForContextMenu(lv);
+        //    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        //        @Override
+        //        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        //            view.performLongClick();
+        //        }
+        //    });
+        //    fab.setOnClickListener(new View.OnClickListener() {
+        //        @Override
+        //        public void onClick(View view) {
+        //            Intent i = new Intent(EbooksActivity.this, AddEbookActivity.class);
+        //            startActivity(i);
+        //        }
+        //    });
         }
 
-        sv = findViewById(R.id.svCursos);
+        lv.setTextFilterEnabled(true);
+        sv = findViewById(R.id.sv);
         sv.setOnQueryTextListener(this);
 
         carregar();
@@ -107,14 +94,14 @@ public class CursosActivity extends AppCompatActivity implements SearchView.OnQu
             listaQuery.addAll(lista);
         } else {
             String queryText = newText.toLowerCase();
-            for(Curso u : lista){
-                if(u.getNome().toLowerCase().contains(queryText) ||
-                        u.getDescricao().toLowerCase().contains(queryText)){
+            for(Ebook u : lista){
+                if(u.getTitulo().toLowerCase().contains(queryText) ||
+                        u.getArea().toLowerCase().contains(queryText)){
                     listaQuery.add(u);
                 }
             }
         }
-        lvCursos.setAdapter(new CursosActivity.ListViewAdapter(listaQuery, CursosActivity.this));
+        lv.setAdapter(new EbooksActivity.ListViewAdapter(listaQuery, EbooksActivity.this));
         return true;
     }
 
@@ -127,37 +114,43 @@ public class CursosActivity extends AppCompatActivity implements SearchView.OnQu
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo){
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.setHeaderTitle("Selecione a Ação");
-        menu.add(0,v.getId(),0,"Editar");
-        menu.add(0,v.getId(),0,"Excluir");
+        if(helper.getString("privilgio").equals("D")) {
+            menu.add(0, v.getId(), 0, "Editar");
+            menu.add(0, v.getId(), 0, "Excluir");
+        }else{
+            menu.add(0, v.getId(), 0, "Ler");
+        }
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         Integer pos = info.position;
-        Curso curso = listaQuery.get(pos);
-        final String id = curso.getId();
+        Ebook ebook = listaQuery.get(pos);
+        final String id = ebook.getId();
 
+        if(item.getTitle() == "Ler"){
+        //    Intent i = new Intent(EbooksActivity.this, LerEbookActivity.class);
+        //    i.putExtra("id", id);
+        //    startActivity(i);
+        }
         if(item.getTitle() == "Editar"){
-            Intent i = new Intent(CursosActivity.this, EditCursoActivity.class);
-            i.putExtra("id", id);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(i);
+        //    Intent i = new Intent(EbooksActivity.this, EditEbookActivity.class);
+        //    i.putExtra("id", id);
+        //    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        //    startActivity(i);
         }
         if(item.getTitle() == "Excluir"){
-            AlertDialog.Builder builder = new AlertDialog.Builder(CursosActivity.this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(EbooksActivity.this);
             builder.setCancelable(true);
             builder.setTitle("Deseja excluir esse registro?");
             builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    Map<String, String> params = new HashMap<String, String>();
-                    params.put("deleteId", id.toString());
-
                     StringRequest sr = CRUD.excluir(JSON_URL, id.toString(), getApplicationContext());
-                    RequestQueue rq = VolleySingleton.getInstance(CursosActivity.this).getRequestQueue();
+                    RequestQueue rq = VolleySingleton.getInstance(EbooksActivity.this).getRequestQueue();
                     rq.add(sr);
-                    lvCursos.setAdapter(null);
+                    lv.setAdapter(null);
                     lista.clear();
                     carregar();
                 }
@@ -166,7 +159,6 @@ public class CursosActivity extends AppCompatActivity implements SearchView.OnQu
         }
         return true;
     }
-
     public void carregar(){
         pd.open();
         //Requisição à página por método POST
@@ -177,31 +169,29 @@ public class CursosActivity extends AppCompatActivity implements SearchView.OnQu
                         //Recebe os objetos do JSON
                         try {
                             JSONObject jo = new JSONObject(response);
-                            JSONArray ja = jo.getJSONArray("cursos");
+                            JSONArray ja = jo.getJSONArray("ebooks");
                             //Para cada objeto, adiciona na lista
                             for (int i = 0; i < ja.length(); i++) {
                                 JSONObject objeto = ja.getJSONObject(i);
-                                String id = objeto.getString("id_curso"), nome = objeto.getString("nome_curso"), area = objeto.getString("area"),
-                                        preRequisito = objeto.getString("prerequisito"),
-                                        descricao = objeto.getString("descricao"), tipo = objeto.getString("tipo_curso"),
-                                        cargaHoraria = objeto.getString("carga_horaria");
-                                Double preco = objeto.getDouble("preco");
 
-                                Curso curso = new Curso(id, nome, preco, area, cargaHoraria, preRequisito, descricao, tipo);
-                                lista.add(curso);
-                                listaQuery.add(curso);
+                                Ebook ebook= new Ebook(objeto.getString("id_ebook"), objeto.getString("titulo_livro"),
+                                        objeto.getString("autor"), objeto.getString("ano_edicao"),
+                                        objeto.getString("editora"), objeto.getString("nome"),
+                                        objeto.getString("link"));
+                                lista.add(ebook);
+                                listaQuery.add(ebook);
                             }
                             //Cria um adapter para a lista
-                            ListViewAdapter adapter = new ListViewAdapter(listaQuery, getApplicationContext());
-                            lvCursos.setAdapter(adapter);
+                            EbooksActivity.ListViewAdapter adapter = new EbooksActivity.ListViewAdapter(lista, getApplicationContext());
+                            lv.setAdapter(adapter);
                         } catch (JSONException e) {
                             //Caso haja excessões com o JSON
                             e.printStackTrace();
                         }
                     }
-                },CursosActivity.this);
+                },EbooksActivity.this);
         //Adiciona a requisição à fila
-        RequestQueue rq = VolleySingleton.getInstance(CursosActivity.this).getRequestQueue();
+        RequestQueue rq = VolleySingleton.getInstance(EbooksActivity.this).getRequestQueue();
         rq.add(sr);
         rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
             @Override
@@ -210,15 +200,14 @@ public class CursosActivity extends AppCompatActivity implements SearchView.OnQu
             }
         });
     }
-
     //Classe interna para criar o adapter da classe externa
-    class ListViewAdapter extends ArrayAdapter<Curso> {
+    class ListViewAdapter extends ArrayAdapter<Ebook> {
         //Lista com os adapter e contexto do aplicativo
-        private List<Curso> lista;
+        private List<Ebook> lista;
         private Context contexto;
 
         //Método construtor
-        private ListViewAdapter(List<Curso> lista, Context contexto){
+        private ListViewAdapter(List<Ebook> lista, Context contexto){
             //para a classe mãe
             super(contexto, R.layout.list_item, lista);
 
@@ -235,10 +224,10 @@ public class CursosActivity extends AppCompatActivity implements SearchView.OnQu
             TextView titulo = listViewItem.findViewById(R.id.titulo);
             TextView subtitulo = listViewItem.findViewById(R.id.subtitulo);
             //Recebe o item da posição solicitada
-            Curso curso = lista.get(position);
+            Ebook ebook = lista.get(position);
             //Define conteúdo do item
-            titulo.setText(curso.getNome().toString());
-            subtitulo.setText(curso.getDescricao().toString());
+            titulo.setText(ebook.getTitulo().toString());
+            subtitulo.setText(ebook.getArea().toString());
             //Retorna a View (Item)
             return listViewItem;
         }

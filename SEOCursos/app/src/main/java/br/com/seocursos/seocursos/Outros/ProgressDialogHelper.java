@@ -20,6 +20,7 @@ public class ProgressDialogHelper {
         pd = new ProgressDialog(context);
         pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         pd.setMessage("Aguarde...");
+        pd.setCancelable(false);
     }
     public void open(){
         if(!pd.isShowing()) {

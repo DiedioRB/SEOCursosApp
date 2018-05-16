@@ -35,13 +35,15 @@ import java.util.List;
 import java.util.Map;
 
 import br.com.seocursos.seocursos.ConstClasses.Evento;
+import br.com.seocursos.seocursos.ConstClasses.Usuario;
 import br.com.seocursos.seocursos.Outros.CRUD;
 import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class EventosActivity extends AppCompatActivity implements SearchView.OnQueryTextListener{
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/eventos.php";
     ListView lv;
-    ArrayList<Evento> lista;
+    List<Evento> lista;
+    List<Evento> listaQuery;
     FloatingActionButton fab;
     SearchView sv;
 
@@ -58,6 +60,7 @@ public class EventosActivity extends AppCompatActivity implements SearchView.OnQ
 
         lv = (ListView) findViewById(R.id.lv);
         lista = new ArrayList<Evento>();
+        listaQuery = new ArrayList<Evento>();
         fab = findViewById(R.id.fab);
 
         if(helper.getString("privilegio").equals("D")) {
@@ -88,11 +91,19 @@ public class EventosActivity extends AppCompatActivity implements SearchView.OnQ
 
     @Override
     public boolean onQueryTextChange(String newText){
+        listaQuery.clear();
         if (TextUtils.isEmpty(newText)) {
-            lv.clearTextFilter();
+            listaQuery.addAll(lista);
         } else {
-            lv.setFilterText(newText);
+            String queryText = newText.toLowerCase();
+            for(Evento u : lista){
+                if(u.getNome().toLowerCase().contains(queryText) ||
+                        u.getDia().toLowerCase().contains(queryText)){
+                    listaQuery.add(u);
+                }
+            }
         }
+        lv.setAdapter(new EventosActivity.ListViewAdapter(listaQuery, EventosActivity.this));
         return true;
     }
 
@@ -113,7 +124,7 @@ public class EventosActivity extends AppCompatActivity implements SearchView.OnQ
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         Integer pos = info.position;
-        Evento evento = lista.get(pos);
+        Evento evento = listaQuery.get(pos);
         final String id = evento.getId();
 
         if (item.getTitle() == "Editar") {
@@ -164,6 +175,7 @@ public class EventosActivity extends AppCompatActivity implements SearchView.OnQ
 
                         Evento evento = new Evento(id, nome, lugar, dia, telefone, valor, formaPagamento);
                         lista.add(evento);
+                        listaQuery.add(evento);
                     }
                     //Cria um adapter para a lista
                     ListViewAdapter adapter = new ListViewAdapter(lista, getApplicationContext());
@@ -190,7 +202,6 @@ public class EventosActivity extends AppCompatActivity implements SearchView.OnQ
         //Lista com os adapter e contexto do aplicativo
         private List<Evento> lista;
         private Context contexto;
-        private List<Evento> orig;
 
         //Método construtor
         private ListViewAdapter(List<Evento> lista, Context contexto){
@@ -199,44 +210,6 @@ public class EventosActivity extends AppCompatActivity implements SearchView.OnQ
 
             this.lista = lista;
             this.contexto = contexto;
-        }
-
-        @Override
-        public int getCount() {
-            return lista.size();
-        }
-
-        @Override
-        public Filter getFilter() {
-            return new Filter() {
-                @Override
-                protected FilterResults performFiltering(CharSequence constraint) {
-                    final FilterResults oReturn = new FilterResults();
-                    final ArrayList<Evento> results = new ArrayList<Evento>();
-                    if (orig == null) {
-                        orig = lista;
-                    }
-                    if (constraint != null) {
-                        if (orig != null && orig.size() > 0) {
-                            for (final Evento g : orig) {
-                                if ((g.getNome().toLowerCase().contains(constraint.toString())) ||
-                                        (g.getDia().toLowerCase().contains(constraint.toString()))) {
-                                    results.add(g);
-                                }
-                            }
-                        }
-                        oReturn.values = results;
-                    }
-                    return oReturn;
-                }
-
-                @SuppressWarnings("unchecked")
-                @Override
-                protected void publishResults(CharSequence constraint, FilterResults results) {
-                    lista = (ArrayList<Evento>) results.values;
-                    notifyDataSetChanged();
-                }
-            };
         }
 
         //Método que retorna o item para o ListView

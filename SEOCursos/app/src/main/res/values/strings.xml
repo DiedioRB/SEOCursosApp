@@ -58,10 +58,13 @@
 
     <!--Inputs de Curso-->
     <string name="preRequisito">Pré-requisitos</string>
+    <string name="informacoesDoCurso">Informações do Curso</string>
 
     <!--Inputs de Tarefa-->
     <string name="descricao">Descrição</string>
     <string name="disciplina">Disciplina</string>
+    <string name="resposta">Resposta</string>
+    <string name="responderTarefa">Responder Tarefa</string>
 
     <!--Inputs de Disciplina-->
     <string name="nivel">Nível</string>
@@ -104,4 +107,12 @@
     <string name="inscreverSe">Inscrever-se</string>
     <string name="voltar">Voltar</string>
 
+    <!--Gráficos-->
+    <string name="graficos">Gráficos</string>
+    <string name="mensalidades">Mensalidades</string>
+    <string name="inadimplentes">Inadimplentes</string>
+    <string name="relatorioDeMensalidades">Relatório de Mensalidades</string>
+    <string name="relatorioDeInadimplentes">Relatório de Inadimplentes</string>
+
+    <string name="asset_statements" translatable="false">[{\n  \"relation\": [\"delegate_permission/common.handle_all_urls\"],\n  \"target\": {\n    \"namespace\": \"web\",\n    \"site\": \"https://seocursos.com.br\",\n  }\n}]</string>
 </resources>

@@ -9,48 +9,138 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/logo"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:label">
-        <meta-data android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id"/>
+        <meta-data
+            android:name="asset_statements"
+            android:resource="@string/asset_statements" />
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
 
-        <activity android:name="com.facebook.FacebookActivity"
-            android:configChanges=
-                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name" />
-
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="seocursos.com.br"
+                    android:scheme="http" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="www.seocursos.com.br"
+                    android:scheme="http" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="seocursos.com.br"
+                    android:scheme="https" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="www.seocursos.com.br"
+                    android:scheme="https" />
+            </intent-filter>
         </activity>
-        <activity android:name=".CursosActivity" />
-        <activity android:name=".UsuariosActivity" />
-        <activity android:name=".DisciplinasActivity" />
-        <activity android:name=".TarefasActivity" />
-        <activity android:name=".AddUsuarioActivity" />
-        <activity android:name=".EditUsuarioActivity" />
-        <activity android:name=".AddTarefaActivity" />
-        <activity android:name=".AddDisciplinaActivity" />
-        <activity android:name=".EventosActivity" />
-        <activity android:name=".EnquetesActivity" />
-        <activity android:name=".AddEnqueteActivity" />
-        <activity android:name=".EditEnqueteActivity" />
-        <activity android:name=".AddEventoActivity" />
-        <activity android:name=".ChatActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".AddCursoActivity" />
-        <activity android:name=".EditTarefaActivity" />
-        <activity android:name=".EditEventoActivity" />
-        <activity android:name=".EditDisciplinaActivity" />
-        <activity android:name=".EditCursoActivity" />
-        <activity android:name=".InfoCursoActivity"/>
+        <activity
+            android:name=".CursosActivity"
+            android:label="@string/cursos" />
+        <activity
+            android:name=".UsuariosActivity"
+            android:label="@string/usuarios" />
+        <activity
+            android:name=".DisciplinasActivity"
+            android:label="@string/disciplinas" />
+        <activity
+            android:name=".TarefasActivity"
+            android:label="@string/tarefas" />
+        <activity
+            android:name=".AddUsuarioActivity"
+            android:label="@string/novoUsuario" />
+        <activity
+            android:name=".EditUsuarioActivity"
+            android:label="@string/editarUsuario" />
+        <activity
+            android:name=".AddTarefaActivity"
+            android:label="@string/novaTarefa" />
+        <activity
+            android:name=".AddDisciplinaActivity"
+            android:label="@string/novaDisciplina" />
+        <activity
+            android:name=".EventosActivity"
+            android:label="@string/eventos" />
+        <activity
+            android:name=".EnquetesActivity"
+            android:label="@string/enquetes" />
+        <activity
+            android:name=".AddEnqueteActivity"
+            android:label="@string/novaEnquete" />
+        <activity
+            android:name=".EditEnqueteActivity"
+            android:label="@string/editarEnquete" />
+        <activity
+            android:name=".AddEventoActivity"
+            android:label="@string/novoEvento" />
+        <activity
+            android:name=".ChatActivity"
+            android:label="@string/chat" />
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/app_name" />
+        <activity
+            android:name=".AddCursoActivity"
+            android:label="@string/novoCurso" />
+        <activity
+            android:name=".EditTarefaActivity"
+            android:label="@string/editarTarefa" />
+        <activity
+            android:name=".EditEventoActivity"
+            android:label="@string/editarEvento" />
+        <activity
+            android:name=".EditDisciplinaActivity"
+            android:label="@string/editarDisciplina" />
+        <activity
+            android:name=".EditCursoActivity"
+            android:label="@string/editarCurso" />
+        <activity
+            android:name=".InfoCursoActivity"
+            android:label="@string/informacoesDoCurso" />
+        <activity
+            android:name=".RespostaTarefaActivity"
+            android:label="@string/responderTarefa" />
+        <activity android:name=".GraficosActivity" />
+        <activity android:name=".EbooksActivity"></activity>
     </application>
 
 </manifest>

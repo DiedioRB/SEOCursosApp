@@ -29,7 +29,7 @@
                 android:layout_height="50dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_add_a_photo"
-                android:background="@color/whiteGrey"/>
+                android:background="@color/white"/>
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">

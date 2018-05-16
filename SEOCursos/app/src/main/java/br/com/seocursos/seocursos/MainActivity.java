@@ -1,6 +1,7 @@
 package br.com.seocursos.seocursos;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -31,10 +32,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        handleIntent(getIntent());
+
         container = findViewById(R.id.container);
 
         helper = new SharedPreferencesHelper(MainActivity.this);
-        if(!helper.getBoolean("login")){
+        if (!helper.getBoolean("login")) {
             Intent i = new Intent(MainActivity.this, LoginActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(i);
@@ -44,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             Fragment menu = null;
             String privilegio = helper.getString("privilegio");
-            if(privilegio != null) {
+            if (privilegio != null) {
                 switch (helper.getString("privilegio")) {
                     case "A":
                         menu = AlunoMenu.newInstance();
@@ -64,10 +67,27 @@ public class MainActivity extends AppCompatActivity {
                 View v = menu.onCreateView(inflater, null, savedInstanceState);
                 container.addView(v, 0);
             }
-        }catch(NullPointerException e){
+        } catch (NullPointerException e) {
             e.printStackTrace();
         }
+        // ATTENTION: This was auto-generated to handle app links.
+        Intent appLinkIntent = getIntent();
+        String appLinkAction = appLinkIntent.getAction();
+        Uri appLinkData = appLinkIntent.getData();
     }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+    private void handleIntent(Intent intent) {
+        String appLinkAction = intent.getAction();
+        Uri appLinkData = intent.getData();
+        if (Intent.ACTION_VIEW.equals(appLinkAction) && appLinkData != null){
+            String recipeId = appLinkData.getLastPathSegment();
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
@@ -93,6 +113,10 @@ public class MainActivity extends AppCompatActivity {
         Intent i = new Intent(MainActivity.this, CursosActivity.class);
         startActivity(i);
     }
+    public void ebooks(View v){
+        Intent i = new Intent(MainActivity.this, EbooksActivity.class);
+        startActivity(i);
+    }
     public void disciplinas(View v){
         Intent i = new Intent(MainActivity.this, DisciplinasActivity.class);
         startActivity(i);
@@ -111,6 +135,10 @@ public class MainActivity extends AppCompatActivity {
     }
     public void chat(View v){
         Intent i = new Intent(MainActivity.this, ChatActivity.class);
+        startActivity(i);
+    }
+    public void graficos(View v){
+        Intent i = new Intent(MainActivity.this, GraficosActivity.class);
         startActivity(i);
     }
     public void sair(){

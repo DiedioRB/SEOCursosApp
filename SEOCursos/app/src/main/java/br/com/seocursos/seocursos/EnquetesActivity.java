@@ -35,13 +35,15 @@ import java.util.List;
 import java.util.Map;
 
 import br.com.seocursos.seocursos.ConstClasses.Enquete;
+import br.com.seocursos.seocursos.ConstClasses.Usuario;
 import br.com.seocursos.seocursos.Outros.CRUD;
 import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class EnquetesActivity extends AppCompatActivity implements SearchView.OnQueryTextListener{
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/enquetes.php";
     ListView lv;
-    ArrayList<Enquete> lista;
+    List<Enquete> lista;
+    List<Enquete> listaQuery;
     FloatingActionButton fab;
     SearchView sv;
 
@@ -58,6 +60,7 @@ public class EnquetesActivity extends AppCompatActivity implements SearchView.On
 
         lv = (ListView) findViewById(R.id.lv);
         lista = new ArrayList<Enquete>();
+        listaQuery = new ArrayList<Enquete>();
         fab = findViewById(R.id.fab);
 
         if(!helper.getString("privilegio").equals("A")) {
@@ -90,11 +93,18 @@ public class EnquetesActivity extends AppCompatActivity implements SearchView.On
 
     @Override
     public boolean onQueryTextChange(String newText){
+        listaQuery.clear();
         if (TextUtils.isEmpty(newText)) {
-            lv.clearTextFilter();
+            listaQuery.addAll(lista);
         } else {
-            lv.setFilterText(newText);
+            String queryText = newText.toLowerCase();
+            for(Enquete u : lista){
+                if(u.getPergunta().toLowerCase().contains(queryText)){
+                    listaQuery.add(u);
+                }
+            }
         }
+        lv.setAdapter(new EnquetesActivity.ListViewAdapter(listaQuery, EnquetesActivity.this));
         return true;
     }
 
@@ -115,7 +125,7 @@ public class EnquetesActivity extends AppCompatActivity implements SearchView.On
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         Integer pos = info.position;
-        Enquete enquete = lista.get(pos);
+        Enquete enquete = listaQuery.get(pos);
         final String id = enquete.getId();
 
         if (item.getTitle() == "Editar") {
@@ -166,6 +176,7 @@ public class EnquetesActivity extends AppCompatActivity implements SearchView.On
 
                         Enquete enquete = new Enquete(id, pergunta, valorA, valorB, valorC, valorD, valorE);
                         lista.add(enquete);
+                        listaQuery.add(enquete);
                     }
                     //Cria um adapter para a lista
                     ListViewAdapter adapter = new ListViewAdapter(lista, getApplicationContext());
@@ -192,7 +203,6 @@ public class EnquetesActivity extends AppCompatActivity implements SearchView.On
         //Lista com os adapter e contexto do aplicativo
         private List<Enquete> lista;
         private Context contexto;
-        private List<Enquete> orig;
 
         //Método construtor
         private ListViewAdapter(List<Enquete> lista, Context contexto){
@@ -201,43 +211,6 @@ public class EnquetesActivity extends AppCompatActivity implements SearchView.On
 
             this.lista = lista;
             this.contexto = contexto;
-        }
-
-        @Override
-        public int getCount() {
-            return lista.size();
-        }
-
-        @Override
-        public Filter getFilter() {
-            return new Filter() {
-                @Override
-                protected FilterResults performFiltering(CharSequence constraint) {
-                    final FilterResults oReturn = new FilterResults();
-                    final ArrayList<Enquete> results = new ArrayList<Enquete>();
-                    if (orig == null) {
-                        orig = lista;
-                    }
-                    if (constraint != null) {
-                        if (orig != null && orig.size() > 0) {
-                            for (final Enquete g : orig) {
-                                if (g.getPergunta().toLowerCase().contains(constraint.toString())) {
-                                    results.add(g);
-                                }
-                            }
-                        }
-                        oReturn.values = results;
-                    }
-                    return oReturn;
-                }
-
-                @SuppressWarnings("unchecked")
-                @Override
-                protected void publishResults(CharSequence constraint, FilterResults results) {
-                    lista = (ArrayList<Enquete>) results.values;
-                    notifyDataSetChanged();
-                }
-            };
         }
 
         //Método que retorna o item para o ListView
