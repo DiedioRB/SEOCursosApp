@@ -64,6 +64,7 @@
     <string name="descricao">Descrição</string>
     <string name="disciplina">Disciplina</string>
     <string name="resposta">Resposta</string>
+    <string name="respostas">Respostas</string>
     <string name="responderTarefa">Responder Tarefa</string>
 
     <!--Inputs de Disciplina-->

@@ -1,13 +1,18 @@
 package br.com.seocursos.seocursos;
 
+import android.app.DownloadManager;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -84,16 +89,29 @@ public class GraficosActivity extends AppCompatActivity {
 
     public void downloadRelatorio(int relatorio){
         String url = RELATORIO_URL;
+        String nomeRelatorio = "Relatório de ";
         switch(relatorio) {
             case MENSALIDADES:
-                url += "?mensalidades&androidDownload";
+                url += "?mensalidades=&androidDownload=";
+                nomeRelatorio += "mensalidades";
                 break;
             case INADIMPLENTES:
-                url += "?inadimplentes&androidDownload";
+                url += "?inadimplentes=&androidDownload=";
+                nomeRelatorio += "inadimplentes";
                 break;
         }
-        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        startActivity(i);
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+        request.setTitle(nomeRelatorio);
+
+        request.allowScanningByMediaScanner();
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, nomeRelatorio);
+
+        DownloadManager manager = (DownloadManager)getSystemService(Context.DOWNLOAD_SERVICE);
+        if(manager != null) {
+            manager.enqueue(request);
+        }
     }
 
     public void loadWebviewGraphic(int grafico){
@@ -107,6 +125,6 @@ public class GraficosActivity extends AppCompatActivity {
                 url += "?inadimplentes";
                 break;
         }
-        webview.loadUrl("http://drive.google.com/viewerng/viewer?embedded=true&url=https://seocursos.com.br/Ebooks/Livros/5a1cb86ebee8d.pdf");
+        webview.loadUrl(url);
     }
 }

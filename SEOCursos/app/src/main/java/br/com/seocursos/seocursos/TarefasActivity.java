@@ -75,9 +75,12 @@ public class TarefasActivity extends AppCompatActivity implements SearchView.OnQ
             lvTarefas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    //       Intent i = new Intent(TarefasActivity.this, RespostasActivity.class);
-                    //       i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    //       startActivity(i);
+                    //TODO: Terminar de fazer a visualização de respostas
+                    String id = listaQuery.get(i).getId();
+                    Intent intent = new Intent(TarefasActivity.this, RespostasActivity.class);
+                    intent.putExtra("id", id);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
                 }
             });
             if(helper.getString("privilegio").equals("D")){

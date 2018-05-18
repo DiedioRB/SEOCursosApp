@@ -191,7 +191,9 @@ public class LoginActivity extends AppCompatActivity {
 
                         Usuario usuario = new Usuario(id, nome,email,foto,sexo,tipoUsuario,cpf,cep,endereco,numero,cidade,estado);
 
-                        //TODO: os parâmetros para sesão são login(b), id, nome, email, privilegio
+                        /**
+                         * os parâmetros para sesão são login(b), id, nome, email, privilegio
+                         */
                         helper.setBoolean("login", true);
                         helper.setString("id", id);
                         helper.setString("nome", nome);

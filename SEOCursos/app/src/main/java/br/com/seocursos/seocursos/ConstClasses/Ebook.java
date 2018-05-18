@@ -1,4 +1,4 @@
-package br.com.seocursos.seocursos;
+package br.com.seocursos.seocursos.ConstClasses;
 
 /**
  * Created by Aluno on 14/05/2018.

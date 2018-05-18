@@ -3,7 +3,6 @@ package br.com.seocursos.seocursos;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,11 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -31,12 +28,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import br.com.seocursos.seocursos.ConstClasses.Curso;
-import br.com.seocursos.seocursos.ConstClasses.Usuario;
+import br.com.seocursos.seocursos.ConstClasses.Ebook;
 import br.com.seocursos.seocursos.Outros.CRUD;
 import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
@@ -79,6 +73,8 @@ public class EbooksActivity extends AppCompatActivity implements SearchView.OnQu
         //            startActivity(i);
         //        }
         //    });
+        }else{
+            fab.setVisibility(View.GONE);
         }
 
         lv.setTextFilterEnabled(true);
