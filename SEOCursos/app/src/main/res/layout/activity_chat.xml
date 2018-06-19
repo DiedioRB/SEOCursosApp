@@ -20,7 +20,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:srl_direction="both"
-                android:layout_below="@id/titulo">
+                android:layout_below="@id/titulo"
+                android:layout_marginBottom="50dp">
                 <ListView
                     android:id="@+id/list"
                     android:layout_width="match_parent"
@@ -30,7 +31,7 @@
         <LinearLayout
             android:id="@+id/msgSend"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_alignParentBottom="true">
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"

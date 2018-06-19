@@ -32,11 +32,13 @@ public class AddDisciplinaActivity extends AppCompatActivity {
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/disciplinas.php";
     TextInputEditText nome,cargaHoraria,duracao,area;
     RadioGroup nivel,modalidade;
-    Spinner cursos;
+    Spinner cursos, tutores;
     Button btn;
 
-    ArrayAdapter<String> adapter;
+    ArrayAdapter<String> adapterCursos;
+    ArrayAdapter<String> adapterTutores;
     ArrayList<Curso> listaCursos;
+    ArrayList<String> listaTutores;
 
     String id;
     ProgressDialogHelper pd;
@@ -57,12 +59,16 @@ public class AddDisciplinaActivity extends AppCompatActivity {
         modalidade = findViewById(R.id.modalidade);
         btn = findViewById(R.id.confirmar);
 
-        adapter = new ArrayAdapter<String>(AddDisciplinaActivity.this, R.layout.support_simple_spinner_dropdown_item);
+        adapterCursos = new ArrayAdapter<String>(AddDisciplinaActivity.this, R.layout.support_simple_spinner_dropdown_item);
+        adapterTutores = new ArrayAdapter<String>(AddDisciplinaActivity.this, R.layout.support_simple_spinner_dropdown_item);
         cursos = findViewById(R.id.cursos);
+        tutores = findViewById(R.id.tutores);
         listaCursos = new ArrayList<Curso>();
+        listaTutores = new ArrayList<String>();
 
         carregar();
-        cursos.setAdapter(adapter);
+        cursos.setAdapter(adapterCursos);
+        tutores.setAdapter(adapterTutores);
 
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,7 +77,6 @@ public class AddDisciplinaActivity extends AppCompatActivity {
                 Map<String,String> params = new HashMap<String,String>();
                 params.put("nome", nome.getText().toString());
                 params.put("cargaHoraria", cargaHoraria.getText().toString());
-                params.put("nivel", area.getText().toString());
                 params.put("duracao", duracao.getText().toString());
                 params.put("area", area.getText().toString());
 
@@ -105,6 +110,9 @@ public class AddDisciplinaActivity extends AppCompatActivity {
                 id = curso.getId();
                 params.put("id_curso", id);
 
+                String idTutor = listaTutores.get(tutores.getSelectedItemPosition());
+                params.put("idTutor", idTutor);
+
                 StringRequest sr = CRUD.inserir(JSON_URL, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -112,14 +120,13 @@ public class AddDisciplinaActivity extends AppCompatActivity {
                             JSONObject jo = new JSONObject(response);
                             boolean enviado = jo.getBoolean("resposta");
                             if(enviado) {
-                                Toast.makeText(AddDisciplinaActivity.this, "Cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(AddDisciplinaActivity.this, getResources().getString(R.string.cadastradoComSucesso), Toast.LENGTH_SHORT).show();
                             }else{
-                                Toast.makeText(AddDisciplinaActivity.this, "Falha no cadastro!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(AddDisciplinaActivity.this, getResources().getString(R.string.falhaCadastro), Toast.LENGTH_SHORT).show();
                             }
                             Intent i = new Intent(AddDisciplinaActivity.this, DisciplinasActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(i);
-                            Toast.makeText(AddDisciplinaActivity.this, response.toString(), Toast.LENGTH_SHORT).show();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -147,9 +154,9 @@ public class AddDisciplinaActivity extends AppCompatActivity {
                     JSONArray ja = jo.getJSONArray("cursos");
                     for(Integer i=0;i<ja.length();i++){
                         JSONObject objeto = ja.getJSONObject(i);
-                        Curso curso = new Curso(objeto.getString("id_curso"),objeto.getString("nome_curso"),null,null,null,null,null,null);
+                        Curso curso = new Curso(objeto.getString("idCurso"),objeto.getString("nome_curso"),null,null,null,null,null,null);
                         listaCursos.add(curso);
-                        adapter.add(curso.getNome());
+                        adapterCursos.add(curso.getNome());
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -158,13 +165,38 @@ public class AddDisciplinaActivity extends AppCompatActivity {
                 }
             }
         }, getApplicationContext());
+
         RequestQueue rq = VolleySingleton.getInstance(AddDisciplinaActivity.this).getRequestQueue();
-        rq.add(sr);
         rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
             @Override
             public void onRequestFinished(Request<Object> request) {
                 pd.close();
             }
         });
+
+        rq.add(sr);
+
+        url = "https://www.seocursos.com.br/PHP/Android/disciplinas.php";
+        Map<String,String> params = new HashMap<>();
+        params.put("getTutores", "getTutores");
+
+        sr = CRUD.customRequest(url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jo = new JSONObject(response);
+                    JSONArray ja = jo.getJSONArray("tutores");
+                    for(int i=0;i<ja.length();i++){
+                        JSONObject objeto = ja.getJSONObject(i);
+                        listaTutores.add(objeto.getString("idUsuario"));
+                        adapterTutores.add(objeto.getString("nome"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, AddDisciplinaActivity.this, params);
+
+        rq.add(sr);
     }
 }

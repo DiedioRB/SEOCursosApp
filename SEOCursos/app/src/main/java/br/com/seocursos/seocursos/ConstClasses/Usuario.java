@@ -73,17 +73,19 @@ public class Usuario {
         this.cidade = cidade;
         this.estado = estado;
     }
-    public String getTipoString(){
-        switch(tipoUsuario){
-            case "A":
-                return "Aluno";
-            case "T":
-                return "Tutor";
-            case "D":
-                return "Administrador";
-            default:
-                return "Tipo não especificado";
-        }
+    public Usuario(Usuario usuario){
+        this.id = usuario.getId();
+        this.nome = usuario.getNome();
+        this.email = usuario.getEmail();
+        this.foto = usuario.getFoto();
+        this.sexo = usuario.getSexo();
+        this.tipoUsuario = usuario.getTipoUsuario();
+        this.cpf = usuario.getCpf();
+        this.cep = usuario.getCep();
+        this.endereco = usuario.getEndereco();
+        this.numero = usuario.getNumero();
+        this.cidade = usuario.getCidade();
+        this.estado = usuario.getEstado();
     }
 }
 

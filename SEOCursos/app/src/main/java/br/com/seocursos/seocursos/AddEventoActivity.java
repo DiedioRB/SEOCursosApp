@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import br.com.jansenfelipe.androidmask.MaskEditTextChangedListener;
 import br.com.seocursos.seocursos.Outros.CRUD;
 import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
@@ -49,6 +50,9 @@ public class AddEventoActivity extends AppCompatActivity {
         dia = findViewById(R.id.dia);
         telefone = findViewById(R.id.telefone);
         preco = findViewById(R.id.preco);
+
+        MaskEditTextChangedListener diaMask = new MaskEditTextChangedListener("##/##/####", dia);
+        dia.addTextChangedListener(diaMask);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             telefone.addTextChangedListener(new PhoneNumberFormattingTextWatcher("BR"));
@@ -100,9 +104,9 @@ public class AddEventoActivity extends AppCompatActivity {
                                 JSONObject jo = new JSONObject(response);
                                 boolean enviado = jo.getBoolean("resposta");
                                 if(enviado) {
-                                    Toast.makeText(AddEventoActivity.this, "Cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(AddEventoActivity.this, getResources().getString(R.string.cadastradoComSucesso), Toast.LENGTH_SHORT).show();
                                 }else{
-                                    Toast.makeText(AddEventoActivity.this, "Falha no cadastro!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(AddEventoActivity.this, getResources().getString(R.string.falhaCadastro), Toast.LENGTH_SHORT).show();
                                 }
                                 Intent i = new Intent(AddEventoActivity.this, EventosActivity.class);
                                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

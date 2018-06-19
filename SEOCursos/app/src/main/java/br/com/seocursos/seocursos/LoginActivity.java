@@ -7,7 +7,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -20,7 +19,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
-import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -36,11 +34,9 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -119,7 +115,7 @@ public class LoginActivity extends AppCompatActivity {
 
         helper = new SharedPreferencesHelper(LoginActivity.this);
         if(helper.getBoolean("login")){
-            Toast.makeText(this, "Você já está online!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.voceJaEstaOnline), Toast.LENGTH_SHORT).show();
             Intent i = new Intent(LoginActivity.this, MainActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(i);
@@ -136,14 +132,14 @@ public class LoginActivity extends AppCompatActivity {
                 if(!(email.getText().toString().isEmpty() || senha.getText().toString().isEmpty())) {
                     fazerLogin();
                 }else{
-                    Toast.makeText(LoginActivity.this, "Preencha os campos primeiro!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, getResources().getString(R.string.preenchaOsCamposPrimeiro), Toast.LENGTH_SHORT).show();
                 }
             }
         });
         senha.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                if (actionId == EditorInfo.IME_ACTION_DONE || event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                     btn.performClick();
                     return true;
                 }
@@ -191,9 +187,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         Usuario usuario = new Usuario(id, nome,email,foto,sexo,tipoUsuario,cpf,cep,endereco,numero,cidade,estado);
 
-                        /**
-                         * os parâmetros para sesão são login(b), id, nome, email, privilegio
-                         */
+                        //os parâmetros para sesão são login(b), id, nome, email, privilegio
                         helper.setBoolean("login", true);
                         helper.setString("id", id);
                         helper.setString("nome", nome);
@@ -275,18 +269,18 @@ public class LoginActivity extends AppCompatActivity {
     }
     public void openPromptSenha(View v){
         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-        builder.setTitle("Recuperação de Senha");
+        builder.setTitle(getResources().getString(R.string.recuperacaoDeSenha));
         builder.setCancelable(true);
 
         final EditText input = new EditText(LoginActivity.this);
         input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-        input.setHint("E-mail");
+        input.setHint(getResources().getString(R.string.email));
         if(emailInput != null){
             input.setText(emailInput);
         }
         builder.setView(input);
 
-        builder.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getResources().getString(R.string.enviar), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 emailInput = input.getText().toString();
@@ -294,10 +288,10 @@ public class LoginActivity extends AppCompatActivity {
                     sendMail(emailInput);
                     email.setText(emailInput);
                 }else{
-                    Toast.makeText(LoginActivity.this, "Digiter um e-mail válido!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, getResources().getString(R.string.digiteUmEmailValido), Toast.LENGTH_SHORT).show();
                 }
             }
-        }).setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+        }).setNegativeButton(getResources().getString(R.string.cancelar), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 emailInput = input.getText().toString();
@@ -320,7 +314,7 @@ public class LoginActivity extends AppCompatActivity {
                     JSONObject objeto = new JSONObject(response);
                     boolean enviado = objeto.getBoolean("resposta");
                     if(enviado){
-                        Toast.makeText(LoginActivity.this, "Uma mensagem foi enviada ao seu e-mail!\nVocê tem uma semana para recuperar a senha!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, getResources().getString(R.string.mensagemRecuperacaoSenha), Toast.LENGTH_SHORT).show();
                     }else{
                         String error = objeto.getString("error");
                         Toast.makeText(LoginActivity.this, error, Toast.LENGTH_SHORT).show();

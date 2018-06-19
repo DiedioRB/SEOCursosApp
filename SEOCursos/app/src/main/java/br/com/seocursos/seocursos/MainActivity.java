@@ -11,9 +11,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
+import com.flurry.android.FlurryAgent;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -25,6 +27,7 @@ import br.com.seocursos.seocursos.Fragments.TutorMenu;
 public class MainActivity extends AppCompatActivity {
     private String nome;
 
+    TextView userName;
     LinearLayout container;
     SharedPreferencesHelper helper;
 
@@ -32,8 +35,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        handleIntent(getIntent());
+        new FlurryAgent.Builder().withLogEnabled(false).build(this, "62X37KYC3XJ5XPQF2RP2");
 
+        userName = findViewById(R.id.userName);
         container = findViewById(R.id.container);
 
         helper = new SharedPreferencesHelper(MainActivity.this);
@@ -43,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(i);
         }
         nome = helper.getString("nome");
+        userName.setText(nome);
 
         try {
             Fragment menu = null;
@@ -59,13 +64,13 @@ public class MainActivity extends AppCompatActivity {
                         menu = AdministradorMenu.newInstance();
                         break;
                     default:
-                        Toast.makeText(MainActivity.this, "Erro ao carregar o menu!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, getResources().getString(R.string.erroAoCarregarMenu), Toast.LENGTH_SHORT).show();
                         sair();
                         break;
                 }
                 LayoutInflater inflater = getLayoutInflater();
                 View v = menu.onCreateView(inflater, null, savedInstanceState);
-                container.addView(v, 0);
+                container.addView(v, 1);
             }
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -74,18 +79,6 @@ public class MainActivity extends AppCompatActivity {
         Intent appLinkIntent = getIntent();
         String appLinkAction = appLinkIntent.getAction();
         Uri appLinkData = appLinkIntent.getData();
-    }
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        handleIntent(intent);
-    }
-    private void handleIntent(Intent intent) {
-        String appLinkAction = intent.getAction();
-        Uri appLinkData = intent.getData();
-        if (Intent.ACTION_VIEW.equals(appLinkAction) && appLinkData != null){
-            String recipeId = appLinkData.getLastPathSegment();
-        }
     }
 
     @Override
@@ -96,8 +89,12 @@ public class MainActivity extends AppCompatActivity {
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
+        // Verifica o item selecionado
         switch (item.getItemId()) {
+            case R.id.minhaConta:
+                Intent i = new Intent(MainActivity.this, MinhaContaActivity.class);
+                startActivity(i);
+                return true;
             case R.id.sair:
                 sair();
                 return true;
@@ -106,41 +103,41 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     public void usuarios(View v){
-        Intent i = new Intent(MainActivity.this, UsuariosActivity.class);
-        startActivity(i);
+        goTo(UsuariosActivity.class);
     }
     public void cursos(View v){
-        Intent i = new Intent(MainActivity.this, CursosActivity.class);
-        startActivity(i);
+        goTo(CursosActivity.class);
     }
     public void ebooks(View v){
-        Intent i = new Intent(MainActivity.this, EbooksActivity.class);
-        startActivity(i);
+        goTo(EbooksActivity.class);
     }
     public void disciplinas(View v){
-        Intent i = new Intent(MainActivity.this, DisciplinasActivity.class);
-        startActivity(i);
+        goTo(DisciplinasActivity.class);
     }
     public void tarefas(View v){
-        Intent i = new Intent(MainActivity.this, TarefasActivity.class);
-        startActivity(i);
+        goTo(TarefasActivity.class);
     }
     public void eventos(View v){
-        Intent i = new Intent(MainActivity.this, EventosActivity.class);
-        startActivity(i);
+        goTo(EventosActivity.class);
     }
     public void enquetes(View v){
-        Intent i = new Intent(MainActivity.this, EnquetesActivity.class);
-        startActivity(i);
+        goTo(EnquetesActivity.class);
     }
     public void chat(View v){
-        Intent i = new Intent(MainActivity.this, ChatActivity.class);
-        startActivity(i);
+        goTo(ChatActivity.class);
     }
     public void graficos(View v){
-        Intent i = new Intent(MainActivity.this, GraficosActivity.class);
+        goTo(GraficosActivity.class);
+    }
+    public void meusCursos(View v){
+        goTo(MeusCursosActivity.class);
+    }
+
+    public void goTo(Class classe){
+        Intent i = new Intent(MainActivity.this, classe);
         startActivity(i);
     }
+
     public void sair(){
         helper.setBoolean("login", false);
         helper.setString("id", null);
@@ -155,8 +152,7 @@ public class MainActivity extends AppCompatActivity {
         GoogleSignInClient client = GoogleSignIn.getClient(this, gso);
         client.signOut();
 
-        Intent i = new Intent(MainActivity.this, LoginActivity.class);
-        startActivity(i);
+        goTo(LoginActivity.class);
     }
 
     @Override

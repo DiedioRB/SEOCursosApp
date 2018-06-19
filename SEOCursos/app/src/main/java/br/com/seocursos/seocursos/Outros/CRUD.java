@@ -17,6 +17,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import br.com.seocursos.seocursos.R;
+
 /**
  * Created by Aluno on 07/03/2018.
  */
@@ -73,7 +75,6 @@ public class CRUD {
                 return params;
             }
         };
-        Toast.makeText(contexto, id, Toast.LENGTH_SHORT).show();
         return sr;
     }
 
@@ -118,9 +119,9 @@ public class CRUD {
                     JSONObject resposta = new JSONObject(response);
                     boolean deletado = resposta.getBoolean("resposta");
                     if(deletado){
-                        Toast.makeText(contexto, "Excluído com sucesso!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(contexto, contexto.getResources().getString(R.string.excluidoComSucesso), Toast.LENGTH_LONG).show();
                     }else{
-                        Toast.makeText(contexto, "Falha na exclusão!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(contexto, contexto.getResources().getString(R.string.falhaExclusao), Toast.LENGTH_LONG).show();
                     }
                 }catch(JSONException e){
                     e.printStackTrace();

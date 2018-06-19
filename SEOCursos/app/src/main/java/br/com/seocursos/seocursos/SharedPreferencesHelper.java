@@ -3,12 +3,6 @@ package br.com.seocursos.seocursos;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import java.util.Map;
-
-/**
- * Created by Aluno on 13/04/2018.
- */
-
 class SharedPreferencesHelper {
     public static final String PREFS_NAME = "SEOPreferences";
 

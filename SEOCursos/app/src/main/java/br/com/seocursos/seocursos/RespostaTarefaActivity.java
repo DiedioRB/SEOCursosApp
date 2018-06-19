@@ -5,6 +5,7 @@ import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,6 +41,8 @@ public class RespostaTarefaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_resposta_tarefa);
 
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
         helper = new SharedPreferencesHelper(RespostaTarefaActivity.this);
 
         pergunta = findViewById(R.id.pergunta);
@@ -54,7 +57,7 @@ public class RespostaTarefaActivity extends AppCompatActivity {
         }catch(NullPointerException e){
             e.printStackTrace();
 
-            Toast.makeText(this, "Tarefa não encontrada!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.tarefaNaoEncontrada), Toast.LENGTH_SHORT).show();
             Intent i = new Intent(RespostaTarefaActivity.this, TarefasActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(i);
@@ -86,7 +89,7 @@ public class RespostaTarefaActivity extends AppCompatActivity {
                     JSONObject jo = new JSONObject(response);
                     boolean enviado = jo.getBoolean("resposta");
                     if(enviado){
-                        Toast.makeText(RespostaTarefaActivity.this, "Enviado com sucesso!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RespostaTarefaActivity.this, getResources().getString(R.string.enviadoComSucesso), Toast.LENGTH_SHORT).show();
                     }else{
                         String error = jo.getString("error");
                         Toast.makeText(RespostaTarefaActivity.this, error, Toast.LENGTH_SHORT).show();

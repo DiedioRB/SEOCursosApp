@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import br.com.jansenfelipe.androidmask.MaskEditTextChangedListener;
 import br.com.seocursos.seocursos.ConstClasses.Evento;
 import br.com.seocursos.seocursos.Outros.CRUD;
 import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
@@ -53,7 +54,7 @@ public class EditEventoActivity extends AppCompatActivity {
             carregar();
         }catch(NullPointerException e){
             e.printStackTrace();
-            Toast.makeText(EditEventoActivity.this, "Evento não encontrado!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(EditEventoActivity.this, getResources().getString(R.string.eventoNaoEncontrado), Toast.LENGTH_SHORT).show();
             Intent i = new Intent(EditEventoActivity.this, EventosActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(i);
@@ -64,6 +65,9 @@ public class EditEventoActivity extends AppCompatActivity {
         dia = findViewById(R.id.dia);
         telefone = findViewById(R.id.telefone);
         preco = findViewById(R.id.preco);
+
+        MaskEditTextChangedListener diaMask = new MaskEditTextChangedListener("##/##/####", dia);
+        dia.addTextChangedListener(diaMask);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             telefone.addTextChangedListener(new PhoneNumberFormattingTextWatcher("BR"));
@@ -116,9 +120,9 @@ public class EditEventoActivity extends AppCompatActivity {
                                 JSONObject jo = new JSONObject(response);
                                 boolean enviado = jo.getBoolean("resposta");
                                 if (enviado) {
-                                    Toast.makeText(EditEventoActivity.this, "Editado com sucesso!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(EditEventoActivity.this, getResources().getString(R.string.editadoComSucesso), Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Toast.makeText(EditEventoActivity.this, "Falha na edição!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(EditEventoActivity.this, getResources().getString(R.string.falhaEdicao), Toast.LENGTH_SHORT).show();
                                 }
                                 Intent i = new Intent(EditEventoActivity.this, EventosActivity.class);
                                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

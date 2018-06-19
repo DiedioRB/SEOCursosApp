@@ -36,7 +36,9 @@ public class EditTarefaActivity extends AppCompatActivity {
     Button btn;
     ArrayList<Disciplina> listaDisciplinas;
     ArrayAdapter<String> adapter;
-    String idDisciplina;
+
+    private String idDisciplina;
+    private int spinnerSelect = 0;
 
     ProgressDialogHelper pd;
 
@@ -52,7 +54,7 @@ public class EditTarefaActivity extends AppCompatActivity {
             id = intent.getStringExtra("id");
         }catch(NullPointerException e){
             e.printStackTrace();
-            Toast.makeText(EditTarefaActivity.this, "Usuário não encontrado!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(EditTarefaActivity.this, getResources().getString(R.string.usuarioNaoEncontrado), Toast.LENGTH_SHORT).show();
             Intent i = new Intent(EditTarefaActivity.this,TarefasActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(i);
@@ -71,6 +73,7 @@ public class EditTarefaActivity extends AppCompatActivity {
             public void onClick(View view) {
                 pd.open();
                 Map<String,String> params = new HashMap<String, String>();
+                params.put("id_tarefa", id);
                 params.put("descricao", descricao.getText().toString());
 
                 Disciplina disciplina = listaDisciplinas.get(spinner.getSelectedItemPosition());
@@ -87,9 +90,9 @@ public class EditTarefaActivity extends AppCompatActivity {
                             JSONObject jo = new JSONObject(response);
                             boolean enviado = jo.getBoolean("resposta");
                             if(enviado) {
-                                Toast.makeText(EditTarefaActivity.this, "Cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditTarefaActivity.this, getResources().getString(R.string.editadoComSucesso), Toast.LENGTH_SHORT).show();
                             }else{
-                                Toast.makeText(EditTarefaActivity.this, "Falha no cadastro!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditTarefaActivity.this, getResources().getString(R.string.falhaEdicao), Toast.LENGTH_SHORT).show();
                             }
                             Intent i = new Intent(EditTarefaActivity.this, TarefasActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -113,38 +116,17 @@ public class EditTarefaActivity extends AppCompatActivity {
         carregar();
 
         spinner.setAdapter(adapter);
+        spinner.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                spinner.setSelection(spinnerSelect);
+            }
+        }, 900);
     }
     public void carregar(){
         pd.open();
         String cursosURL = "https://www.seocursos.com.br/PHP/Android/disciplinas.php";
-        RequestQueue rq = VolleySingleton.getInstance(EditTarefaActivity.this).getRequestQueue();
-        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
-            @Override
-            public void onRequestFinished(Request<Object> request) {
-                pd.close();
-            }
-        });
-
-        StringRequest cursosRequest = CRUD.selecionar(cursosURL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try {
-                    JSONObject jo = new JSONObject(response);
-                    JSONArray ja = jo.getJSONArray("disciplinas");
-                    for(Integer i=0;i<ja.length();i++){
-                        JSONObject objeto = ja.getJSONObject(i);
-                        Disciplina disciplina = new Disciplina(objeto.getString("id_disciplina"),objeto.getString("nome_disciplina"),null,null,null,null,null,null,null);
-                        listaDisciplinas.add(disciplina);
-                        adapter.add(disciplina.getNome());
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }catch (NullPointerException e){
-                    e.printStackTrace();
-                }
-            }
-        }, EditTarefaActivity.this);
-        rq.add(cursosRequest);
+        final RequestQueue rq = VolleySingleton.getInstance(EditTarefaActivity.this).getRequestQueue();
 
         StringRequest sr = CRUD.selecionarEditar(JSON_URL, new Response.Listener<String>() {
             @Override
@@ -154,11 +136,47 @@ public class EditTarefaActivity extends AppCompatActivity {
                     JSONArray ja = jo.getJSONArray("tarefa");
                     JSONObject objeto = ja.getJSONObject(0);
                     descricao.setText(objeto.getString("descricao"));
+                    idDisciplina = objeto.getString("id_disciplina");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         },EditTarefaActivity.this,id);
+
+        final StringRequest cursosRequest = CRUD.selecionar(cursosURL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jo = new JSONObject(response);
+                    JSONArray ja = jo.getJSONArray("disciplinas");
+                    for(Integer i=0;i<ja.length();i++){
+                        JSONObject objeto = ja.getJSONObject(i);
+                        Disciplina disciplina = new Disciplina(objeto.getString("id_disciplina"),
+                                objeto.getString("nome_disciplina"),
+                                null,null,null,null,null,null,null,null);
+                        listaDisciplinas.add(disciplina);
+                        adapter.add(disciplina.getNome());
+
+                        if(idDisciplina.equals(disciplina.getId())){
+                            spinnerSelect = adapter.getPosition(disciplina.getNome());
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }catch (NullPointerException e){
+                    e.printStackTrace();
+                }
+            }
+        }, EditTarefaActivity.this);
+
         rq.add(sr);
+        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+            @Override
+            public void onRequestFinished(Request<Object> request) {
+                rq.add(cursosRequest);
+                rq.removeRequestFinishedListener(this);
+                pd.close();
+            }
+        });
     }
 }

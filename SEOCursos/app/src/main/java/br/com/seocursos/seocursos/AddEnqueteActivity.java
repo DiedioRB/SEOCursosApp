@@ -52,7 +52,7 @@ public class AddEnqueteActivity extends AppCompatActivity {
                 pd.open();
                 Map<String,String> params = new HashMap<String,String>();
 
-                params.put("pergunta", pergunta.getText().toString());
+                params.put("questao", pergunta.getText().toString());
                 params.put("valorA", respostaA.getText().toString());
                 params.put("valorB", respostaB.getText().toString());
                 params.put("valorC", respostaC.getText().toString());
@@ -66,11 +66,11 @@ public class AddEnqueteActivity extends AppCompatActivity {
                             JSONObject jo = new JSONObject(response);
                             boolean enviado = jo.getBoolean("resposta");
                             if(enviado) {
-                                Toast.makeText(AddEnqueteActivity.this, "Cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(AddEnqueteActivity.this, getResources().getString(R.string.cadastradoComSucesso), Toast.LENGTH_SHORT).show();
                             }else{
-                                Toast.makeText(AddEnqueteActivity.this, "Falha no cadastro!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(AddEnqueteActivity.this, getResources().getString(R.string.falhaCadastro), Toast.LENGTH_SHORT).show();
                             }
-                            Intent i = new Intent(AddEnqueteActivity.this, TarefasActivity.class);
+                            Intent i = new Intent(AddEnqueteActivity.this, EnquetesActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(i);
                         } catch (JSONException e) {

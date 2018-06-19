@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +13,7 @@ import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -29,6 +29,9 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,16 +43,19 @@ import br.com.seocursos.seocursos.Outros.ValidaCPF;
 public class AddUsuarioActivity extends AppCompatActivity {
     private final static String JSON_URL = "https://www.seocursos.com.br/PHP/Android/usuarios.php";
     private static final int GALLERY_REQUEST = 1;
-    private Bitmap imagem;
+    private Bitmap imagem = null;
+    private String privilegio = "A";
 
-    TextInputEditText nome,senha,confSenha,email,cpf,cep,endereco,numero,cidade,estado,telefone;
-    RadioGroup sexo,modalidade;
+    TextInputEditText nome,senha,confSenha,email,cpf,cep,endereco,numero,cidade,estado;
+    RadioGroup sexo;
     Button btn;
     ImageView iv;
 
+    LinearLayout formAluno, formTutor;
+    TextInputEditText telUsuario, telRes, telCel, dataNascimento, curso, instituicao, anoConclusao;
+
     ProgressDialogHelper pd;
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,19 +74,56 @@ public class AddUsuarioActivity extends AppCompatActivity {
         numero = (TextInputEditText)findViewById(R.id.numeroUsuario);
         cidade = (TextInputEditText)findViewById(R.id.cidadeUsuario);
         estado = (TextInputEditText)findViewById(R.id.estadoUsuario);
-        telefone = (TextInputEditText)findViewById(R.id.telUsuario);
 
         sexo = (RadioGroup)findViewById(R.id.sexoUsuario);
-        modalidade = (RadioGroup)findViewById(R.id.modalidadeUsuario);
         btn = (Button)findViewById(R.id.confirmarUsuario);
+
+        formAluno = findViewById(R.id.formAluno);
+        formTutor = findViewById(R.id.formTutor);
+
+        telUsuario = findViewById(R.id.telUsuario);
+        telRes = findViewById(R.id.telResidencial);
+        telCel = findViewById(R.id.telCelular);
+        dataNascimento = findViewById(R.id.dataNascimento);
+        curso = findViewById(R.id.curso);
+        instituicao = findViewById(R.id.instituicao);
+        anoConclusao = findViewById(R.id.anoConclusao);
+
+        Intent i =  getIntent();
+        privilegio = i.getStringExtra("privilegio");
+        if(privilegio == null){
+            privilegio = "A";
+        }
+
+        switch(privilegio){
+            case "A":
+                formAluno.setVisibility(View.VISIBLE);
+                formTutor.setVisibility(View.GONE);
+                break;
+            case "T":
+                formAluno.setVisibility(View.GONE);
+                formTutor.setVisibility(View.VISIBLE);
+                break;
+            case "D":
+                formAluno.setVisibility(View.GONE);
+                formTutor.setVisibility(View.GONE);
+                break;
+        }
 
         //Aplica máscara
         MaskEditTextChangedListener maskCPF = new MaskEditTextChangedListener("###.###.###-##",cpf);
         MaskEditTextChangedListener maskCEP = new MaskEditTextChangedListener("##.###-###",cep);
+        MaskEditTextChangedListener maskData = new MaskEditTextChangedListener("##/##/####",dataNascimento);
 
         cpf.addTextChangedListener(maskCPF);
         cep.addTextChangedListener(maskCEP);
-        telefone.addTextChangedListener(new PhoneNumberFormattingTextWatcher("BR"));
+        dataNascimento.addTextChangedListener(maskData);
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            telUsuario.addTextChangedListener(new PhoneNumberFormattingTextWatcher("BR"));
+            telRes.addTextChangedListener(new PhoneNumberFormattingTextWatcher("BR"));
+            telCel.addTextChangedListener(new PhoneNumberFormattingTextWatcher("BR"));
+        }
         iv = findViewById(R.id.imageView);
 
         btn.setOnClickListener(new View.OnClickListener() {
@@ -98,7 +141,33 @@ public class AddUsuarioActivity extends AppCompatActivity {
                 params.put("numero", numero.getText().toString());
                 params.put("cidade", cidade.getText().toString());
                 params.put("estado", estado.getText().toString());
-                params.put("tel", telefone.getText().toString());
+
+                switch(privilegio){
+                    case "A":
+                        params.put("tipoUsuario", "A");
+
+                        params.put("telUsuario", telUsuario.getText().toString());
+                        break;
+                    case "T":
+                        params.put("tipoUsuario", "T");
+                        params.put("telCel", telCel.getText().toString());
+                        params.put("telRes", telRes.getText().toString());
+
+                        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+                        ParsePosition pos = new ParsePosition(0);
+                        Date data = formato.parse(dataNascimento.getText().toString(),pos);
+                        formato = new SimpleDateFormat("yyyy-MM-dd");
+                        String date = formato.format(data);
+
+                        params.put("dataNascimento", date);
+                        params.put("curso", curso.getText().toString());
+                        params.put("instituicao", instituicao.getText().toString());
+                        params.put("anoConclusao", anoConclusao.getText().toString());
+                        break;
+                    case "D":
+                        params.put("tipoUsuario", "D");
+                        break;
+                }
 
                 String sexoS;
                 if(sexo.getCheckedRadioButtonId() == R.id.masculinoUsuario){
@@ -110,24 +179,26 @@ public class AddUsuarioActivity extends AppCompatActivity {
                 params.put("sexo", sexoS);
 
                 //Imagens
-                String imagemUsuario = getStringImage(imagem);
-                params.put("foto", imagemUsuario);
+                if(imagem != null) {
+                    String imagemUsuario = getStringImage(imagem);
+                    params.put("foto", imagemUsuario);
+                }
 
                 StringRequest sr = CRUD.inserir(JSON_URL, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        Toast.makeText(AddUsuarioActivity.this, response, Toast.LENGTH_SHORT).show();
                         try {
                             JSONObject jo = new JSONObject(response);
                             boolean enviado = jo.getBoolean("resposta");
 
                             if(enviado) {
-                                Toast.makeText(AddUsuarioActivity.this, "Cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(AddUsuarioActivity.this, getResources().getString(R.string.cadastradoComSucesso), Toast.LENGTH_SHORT).show();
                             }else{
-                                Toast.makeText(AddUsuarioActivity.this, "Falha no cadastro!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(AddUsuarioActivity.this, getResources().getString(R.string.falhaCadastro), Toast.LENGTH_SHORT).show();
                             }
-                            Intent getI = getIntent();
-                            Intent i;
-                            boolean toLogin = getI.getBooleanExtra("toLogin", false);
+                            Intent i = getIntent();
+                            boolean toLogin = i.getBooleanExtra("toLogin", false);
                             if(toLogin) {
                                 i = new Intent(AddUsuarioActivity.this, LoginActivity.class);
                             }else {
@@ -164,7 +235,7 @@ public class AddUsuarioActivity extends AppCompatActivity {
                         btn.setClickable(false);
                         btn.setBackgroundColor(getResources().getColor(R.color.lightGrey));
                         btn.setTextColor(getResources().getColor(R.color.darkGrey));
-                        Toast.makeText(AddUsuarioActivity.this, "CPF Inválido!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddUsuarioActivity.this, getResources().getString(R.string.cpfInvalido), Toast.LENGTH_SHORT).show();
                     }else{
                         btn.setClickable(true);
                         btn.setBackgroundColor(getResources().getColor(R.color.blueAccent2));
@@ -207,7 +278,7 @@ public class AddUsuarioActivity extends AppCompatActivity {
                             btn.setClickable(false);
                             btn.setBackgroundColor(getResources().getColor(R.color.lightGrey));
                             btn.setTextColor(getResources().getColor(R.color.darkGrey));
-                            Toast.makeText(AddUsuarioActivity.this, "CEP Inválido!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AddUsuarioActivity.this, getResources().getString(R.string.cepInvalido), Toast.LENGTH_SHORT).show();
                         }
                     });
                     RequestQueue rq = VolleySingleton.getInstance(AddUsuarioActivity.this).getRequestQueue();
@@ -242,7 +313,7 @@ public class AddUsuarioActivity extends AppCompatActivity {
                 iv.setImageBitmap(imagem);
             }catch(FileNotFoundException e){
                 e.printStackTrace();
-                Toast.makeText(this, "Erro ao receber a imagem: Imagem não encontrada!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getResources().getString(R.string.imagemNaoEncontrada), Toast.LENGTH_SHORT).show();
             }
         }
     }

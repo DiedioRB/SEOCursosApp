@@ -55,18 +55,6 @@
                 android:hint="@string/email"
                 android:inputType="textEmailAddress"/>
         </android.support.design.widget.TextInputLayout>
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/telUsuario"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/ic_phone"
-                android:drawableStart="@drawable/ic_phone"
-                android:hint="@string/telefone"
-                android:inputType="phone"/>
-        </android.support.design.widget.TextInputLayout>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -90,30 +78,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/feminino"/>
-        </RadioGroup>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/modalidade"
-            android:textSize="18sp"/>
-        <RadioGroup
-            android:id="@+id/modalidadeUsuario"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:checkedButton="@id/eadUsuario">
-            <RadioButton
-                android:id="@+id/eadUsuario"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/ead" />
-            <RadioButton
-                android:id="@+id/semipresencialUsuario"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/semipresencial"/>
         </RadioGroup>
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -151,7 +115,9 @@
                 android:drawableLeft="@drawable/ic_place"
                 android:drawableStart="@drawable/ic_place"
                 android:hint="@string/endereco"
-                android:inputType="textPostalAddress" />
+                android:inputType="textPostalAddress"
+                android:enabled="false"
+                android:focusable="false"/>
         </android.support.design.widget.TextInputLayout>
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -175,7 +141,9 @@
                 android:drawableLeft="@drawable/ic_location_city"
                 android:drawableStart="@drawable/ic_location_city"
                 android:hint="@string/cidade"
-                android:inputType="textPostalAddress"/>
+                android:inputType="textPostalAddress"
+                android:enabled="false"
+                android:focusable="false"/>
         </android.support.design.widget.TextInputLayout>
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -187,8 +155,106 @@
                 android:drawableLeft="@drawable/ic_location_city"
                 android:drawableStart="@drawable/ic_location_city"
                 android:hint="@string/estado"
-                android:inputType="textPostalAddress"/>
+                android:inputType="textPostalAddress"
+                android:enabled="false"
+                android:focusable="false"/>
         </android.support.design.widget.TextInputLayout>
+        <LinearLayout
+            android:id="@+id/formAluno"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:orientation="vertical">
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/telUsuario"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_phone"
+                    android:drawableStart="@drawable/ic_phone"
+                    android:hint="@string/telefone"
+                    android:inputType="phone"/>
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/formTutor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/dataNascimento"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_cake"
+                    android:drawableStart="@drawable/ic_cake"
+                    android:hint="@string/dataNascimento"
+                    android:inputType="date"/>
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/telResidencial"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_phone"
+                    android:drawableStart="@drawable/ic_phone"
+                    android:hint="@string/telefoneResidencial"
+                    android:inputType="phone"/>
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/telCelular"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_phone"
+                    android:drawableStart="@drawable/ic_phone"
+                    android:hint="@string/telefoneCelular"
+                    android:inputType="phone"/>
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/curso"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_assignment"
+                    android:drawableStart="@drawable/ic_assignment"
+                    android:hint="@string/curso" />
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/instituicao"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_school"
+                    android:drawableStart="@drawable/ic_school"
+                    android:hint="@string/instituicao" />
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/anoConclusao"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_date_range"
+                    android:drawableStart="@drawable/ic_date_range"
+                    android:hint="@string/anoDeConclusao"
+                    android:inputType="number"/>
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
 
         <Button
             android:id="@+id/confirmarUsuario"

@@ -127,11 +127,24 @@
                 android:hint="@string/area"
                 android:inputType="text"/>
         </android.support.design.widget.TextInputLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/curso"/>
         <Spinner
             android:id="@+id/cursos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:prompt="@string/cursos"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/tutor"/>
+        <Spinner
+            android:id="@+id/tutores"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:prompt="@string/tutor"/>
         <Button
             android:id="@+id/confirmar"
             android:layout_width="wrap_content"

@@ -9,17 +9,15 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
 import com.android.volley.toolbox.StringRequest;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
@@ -51,13 +49,12 @@ public class ChatActivity extends AppCompatActivity {
     SharedPreferencesHelper helper;
     ProgressDialogHelper pd;
 
-    Handler handler;
-    Runnable updateChat;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         pd = new ProgressDialogHelper(ChatActivity.this);
 
@@ -79,7 +76,6 @@ public class ChatActivity extends AppCompatActivity {
         });
 
         carregar();
-        //TODO: Atualizar chat
 
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,6 +128,7 @@ public class ChatActivity extends AppCompatActivity {
                         Chat chat = new Chat(id, nome, mensagem);
 
                         lista.add(chat);
+                        System.out.println(chat.getNome()+" "+chat.getMensagem());
                     }
                     ChatAdapter adapter = new ChatAdapter(lista, ChatActivity.this);
                     lv.setAdapter(adapter);

@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,9 +13,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -58,6 +57,8 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_usuarios);
 
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
         pd = new ProgressDialogHelper(UsuariosActivity.this);
 
         lvUsuarios = (ListView)findViewById(R.id.lvUsuarios);
@@ -76,9 +77,34 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(UsuariosActivity.this, AddUsuarioActivity.class);
+                final Intent i = new Intent(UsuariosActivity.this, AddUsuarioActivity.class);
                 i.putExtra("toLogin", false);
-                startActivity(i);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(UsuariosActivity.this);
+                builder.setCancelable(true);
+                builder.setTitle(getResources().getString(R.string.novoUsuario));
+                builder.setItems(new CharSequence[]{
+                        getResources().getString(R.string.aluno),
+                        getResources().getString(R.string.tutor),
+                        getResources().getString(R.string.administrador)
+                }, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int ii) {
+                        switch(ii){
+                            case 0:
+                                i.putExtra("privilegio", "A");
+                                break;
+                            case 1:
+                                i.putExtra("privilegio", "T");
+                                break;
+                            case 2:
+                                i.putExtra("privilegio", "D");
+                                break;
+                        }
+                        startActivity(i);
+                    }
+                });
+                builder.create().show();
             }
         });
         lvUsuarios.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -120,10 +146,8 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo){
         super.onCreateContextMenu(menu, v, menuInfo);
-
-        menu.setHeaderTitle("Selecione a Ação");
-        menu.add(0,v.getId(),0,"Editar");
-        menu.add(0,v.getId(),0,"Excluir");
+        menu.setHeaderTitle(getResources().getString(R.string.selecioneAcao));
+        getMenuInflater().inflate(R.menu.edit_menu, menu);
     }
 
     @Override
@@ -132,17 +156,16 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
         Integer pos = info.position;
         Usuario usuario = listaQuery.get(pos);
         final String id = usuario.getId();
-
-        if(item.getTitle() == "Editar"){
+        if(item.getItemId() == R.id.editar){
             Intent i = new Intent(UsuariosActivity.this, EditUsuarioActivity.class);
             i.putExtra("id", id);
             startActivity(i);
         }
-        if(item.getTitle() == "Excluir"){
+        if(item.getItemId() == R.id.excluir){
             AlertDialog.Builder builder = new AlertDialog.Builder(UsuariosActivity.this);
             builder.setCancelable(true);
-            builder.setTitle("Deseja excluir esse registro?");
-            builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+            builder.setTitle(getResources().getString(R.string.desejaExcluirRegistro));
+            builder.setPositiveButton(getResources().getString(R.string.sim), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     Map<String, String> params = new HashMap<String, String>();
@@ -153,9 +176,10 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
                     rq.add(sr);
                     lvUsuarios.setAdapter(null);
                     lista.clear();
+                    listaQuery.clear();
                     carregar();
                 }
-            }).setNegativeButton("Não", null);
+            }).setNegativeButton(getResources().getString(R.string.nao), null);
             builder.create().show();
         }
         return true;
@@ -177,7 +201,7 @@ public class UsuariosActivity extends AppCompatActivity implements SearchView.On
                     for(int i=0;i<ja.length();i++){
                         JSONObject objeto = ja.getJSONObject(i);
                         Integer numero=objeto.getInt("numero");
-                        String id=objeto.getString("id_usuario"),nome=objeto.getString("nome"),email=objeto.getString("email"),
+                        String id=objeto.getString("idUsuario"),nome=objeto.getString("nome"),email=objeto.getString("email"),
                                 foto=objeto.getString("foto"),cpf=objeto.getString("cpf"),
                                 cep=objeto.getString("cep"),endereco=objeto.getString("endereco"),
                                 cidade=objeto.getString("cidade"),estado=objeto.getString("estado"),

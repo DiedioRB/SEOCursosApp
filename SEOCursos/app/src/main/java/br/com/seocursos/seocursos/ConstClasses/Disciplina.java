@@ -5,7 +5,7 @@ package br.com.seocursos.seocursos.ConstClasses;
  */
 
 public class Disciplina {
-    private String id,nome,nivel,cargaHoraria,area,duracao,curso,modalidade,idCurso;
+    private String id,nome,nivel,cargaHoraria,area,duracao,curso,modalidade,idCurso, idTutor;
 
     public String getId() {
         return id;
@@ -43,7 +43,11 @@ public class Disciplina {
         return curso;
     }
 
-    public Disciplina(String id, String nome, String nivel, String cargaHoraria, String area, String duracao, String modalidade, String idCurso, String curso){
+    public String getIdTutor(){
+        return idTutor;
+    }
+
+    public Disciplina(String id, String nome, String nivel, String cargaHoraria, String area, String duracao, String modalidade, String idCurso, String curso, String idTutor){
         this.id = id;
         this.nome= nome;
         this.nivel = nivel;
@@ -53,5 +57,6 @@ public class Disciplina {
         this.modalidade = modalidade;
         this.idCurso = idCurso;
         this.curso = curso;
+        this.idTutor = idTutor;
     }
 }

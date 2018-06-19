@@ -58,14 +58,14 @@ public class InfoCursoActivity extends AppCompatActivity {
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(InfoCursoActivity.this);
                 builder.setCancelable(true);
-                builder.setTitle("Confirmar Inscrição");
-                builder.setMessage("Deseja realmente cadastrar-se em "+titulo.getText().toString()+"?");
-                builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+                builder.setTitle(getResources().getString(R.string.confirmarInscricao));
+                builder.setMessage(getResources().getString(R.string.desejaCadastrarSeEm)+" "+titulo.getText().toString()+"?");
+                builder.setPositiveButton(getResources().getString(R.string.sim), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         inscricao();
                     }
-                }).setNegativeButton("Não", null);
+                }).setNegativeButton(getResources().getString(R.string.nao), null);
 
                 builder.create().show();
             }
@@ -150,7 +150,7 @@ public class InfoCursoActivity extends AppCompatActivity {
                     JSONObject jo = new JSONObject(response);
                     boolean enviado = jo.getBoolean("resposta");
                     if(enviado){
-                        Toast.makeText(InfoCursoActivity.this, "Cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(InfoCursoActivity.this, getResources().getString(R.string.cadastradoComSucesso), Toast.LENGTH_SHORT).show();
                     }else{
                         String error = jo.getString("error");
                         Toast.makeText(InfoCursoActivity.this, error, Toast.LENGTH_SHORT).show();

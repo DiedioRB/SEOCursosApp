@@ -5,7 +5,7 @@ package br.com.seocursos.seocursos.ConstClasses;
  */
 
 public class RespostaTarefa {
-    private String id, resposta, idUsuario, aluno;
+    private String id, resposta, idUsuario, aluno, idDisciplina, idCurso;
 
     public String getId() {
         return id;
@@ -23,10 +23,20 @@ public class RespostaTarefa {
         return aluno;
     }
 
-    public RespostaTarefa(String id, String resposta, String idUsuario, String aluno){
+    public String getIdDisciplina() {
+        return idDisciplina;
+    }
+
+    public String getIdCurso() {
+        return idCurso;
+    }
+
+    public RespostaTarefa(String id, String resposta, String idUsuario, String aluno, String idDisciplina, String idCurso){
         this.id = id;
         this.resposta = resposta;
         this.idUsuario = idUsuario;
         this.aluno = aluno;
+        this.idDisciplina = idDisciplina;
+        this.idCurso = idCurso;
     }
 }

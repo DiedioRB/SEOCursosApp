@@ -5,7 +5,6 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
@@ -27,7 +26,8 @@
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -140,9 +140,31 @@
         <activity
             android:name=".RespostaTarefaActivity"
             android:label="@string/responderTarefa" />
-        <activity android:name=".GraficosActivity" />
-        <activity android:name=".EbooksActivity" />
-        <activity android:name=".RespostasActivity"></activity>
+        <activity
+            android:name=".GraficosActivity"
+            android:label="@string/graficos" />
+        <activity
+            android:name=".EbooksActivity"
+            android:label="@string/ebooks" />
+        <activity
+            android:name=".RespostasActivity"
+            android:label="@string/respostas" />
+        <activity
+            android:name=".RespostaEnqueteActivity"
+            android:label="@string/respostas" />
+        <activity
+            android:name=".MeusCursosActivity"
+            android:label="@string/meusCursos" />
+        <activity
+            android:name=".MenuDisciplinaActivity"
+            android:label="@string/menuDisciplina" />
+        <activity
+            android:name=".AssistirActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/assistir"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".MinhaContaActivity"
+            android:label="@string/minhaConta"/>
     </application>
 
 </manifest>

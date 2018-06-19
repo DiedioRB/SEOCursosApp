@@ -75,9 +75,9 @@ public class AddTarefaActivity extends AppCompatActivity {
                             JSONObject jo = new JSONObject(response);
                             boolean enviado = jo.getBoolean("resposta");
                             if(enviado) {
-                                Toast.makeText(AddTarefaActivity.this, "Cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(AddTarefaActivity.this, getResources().getString(R.string.cadastradoComSucesso), Toast.LENGTH_SHORT).show();
                             }else{
-                                Toast.makeText(AddTarefaActivity.this, "Falha no cadastro!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(AddTarefaActivity.this, getResources().getString(R.string.falhaCadastro), Toast.LENGTH_SHORT).show();
                             }
                             Intent i = new Intent(AddTarefaActivity.this, TarefasActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -113,7 +113,7 @@ public class AddTarefaActivity extends AppCompatActivity {
                     JSONArray ja = jo.getJSONArray("disciplinas");
                     for(Integer i=0;i<ja.length();i++){
                         JSONObject objeto = ja.getJSONObject(i);
-                        Disciplina disciplina = new Disciplina(objeto.getString("id_disciplina"),objeto.getString("nome_disciplina"),null,null,null,null,null,null,null);
+                        Disciplina disciplina = new Disciplina(objeto.getString("id_disciplina"),objeto.getString("nome_disciplina"),null,null,null,null,null,null,null, null);
                         listaDisciplinas.add(disciplina);
                         adapter.add(disciplina.getNome());
                     }

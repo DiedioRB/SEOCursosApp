@@ -10,12 +10,13 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -36,6 +37,9 @@ import java.util.List;
 import java.util.Map;
 
 import br.com.seocursos.seocursos.ConstClasses.Curso;
+import br.com.seocursos.seocursos.ConstClasses.CursoGraduacao;
+import br.com.seocursos.seocursos.ConstClasses.CursoGratis;
+import br.com.seocursos.seocursos.ConstClasses.CursoTecnico;
 import br.com.seocursos.seocursos.ConstClasses.Usuario;
 import br.com.seocursos.seocursos.Outros.CRUD;
 import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
@@ -55,6 +59,8 @@ public class CursosActivity extends AppCompatActivity implements SearchView.OnQu
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cursos);
+
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         pd = new ProgressDialogHelper(CursosActivity.this);
         helper = new SharedPreferencesHelper(CursosActivity.this);
@@ -86,7 +92,7 @@ public class CursosActivity extends AppCompatActivity implements SearchView.OnQu
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                         Intent j = new Intent(CursosActivity.this, InfoCursoActivity.class);
-                        Curso curso = lista.get(i);
+                        Curso curso = listaQuery.get(i);
                         j.putExtra("id",curso.getId());
                         j.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(j);
@@ -126,9 +132,8 @@ public class CursosActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo){
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.setHeaderTitle("Selecione a Ação");
-        menu.add(0,v.getId(),0,"Editar");
-        menu.add(0,v.getId(),0,"Excluir");
+        menu.setHeaderTitle(getResources().getString(R.string.selecioneAcao));
+        getMenuInflater().inflate(R.menu.edit_menu, menu);
     }
 
     @Override
@@ -138,17 +143,17 @@ public class CursosActivity extends AppCompatActivity implements SearchView.OnQu
         Curso curso = listaQuery.get(pos);
         final String id = curso.getId();
 
-        if(item.getTitle() == "Editar"){
+        if(item.getItemId() == R.id.editar){
             Intent i = new Intent(CursosActivity.this, EditCursoActivity.class);
             i.putExtra("id", id);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(i);
         }
-        if(item.getTitle() == "Excluir"){
+        if(item.getItemId() == R.id.excluir){
             AlertDialog.Builder builder = new AlertDialog.Builder(CursosActivity.this);
             builder.setCancelable(true);
-            builder.setTitle("Deseja excluir esse registro?");
-            builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+            builder.setTitle(getResources().getString(R.string.desejaExcluirRegistro));
+            builder.setPositiveButton(getResources().getString(R.string.sim), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     Map<String, String> params = new HashMap<String, String>();
@@ -159,9 +164,10 @@ public class CursosActivity extends AppCompatActivity implements SearchView.OnQu
                     rq.add(sr);
                     lvCursos.setAdapter(null);
                     lista.clear();
+                    listaQuery.clear();
                     carregar();
                 }
-            }).setNegativeButton("Não", null);
+            }).setNegativeButton(getResources().getString(R.string.nao), null);
             builder.create().show();
         }
         return true;
@@ -181,13 +187,44 @@ public class CursosActivity extends AppCompatActivity implements SearchView.OnQu
                             //Para cada objeto, adiciona na lista
                             for (int i = 0; i < ja.length(); i++) {
                                 JSONObject objeto = ja.getJSONObject(i);
-                                String id = objeto.getString("id_curso"), nome = objeto.getString("nome_curso"), area = objeto.getString("area"),
+                                String id = objeto.getString("idCurso"), nome = objeto.getString("nome_curso"), area = objeto.getString("area"),
                                         preRequisito = objeto.getString("prerequisito"),
                                         descricao = objeto.getString("descricao"), tipo = objeto.getString("tipo_curso"),
                                         cargaHoraria = objeto.getString("carga_horaria");
                                 Double preco = objeto.getDouble("preco");
 
                                 Curso curso = new Curso(id, nome, preco, area, cargaHoraria, preRequisito, descricao, tipo);
+                                String disponivel, nivel, modalidade, duracao, titulacao, notaMec, status;
+                                switch(tipo){
+                                    case "F":
+                                        disponivel = objeto.getString("tempo_disponivel");
+                                        nivel = objeto.getString("nivel");
+
+                                        curso = new CursoGratis(curso, disponivel, nivel);
+                                        break;
+                                    case "T":
+                                        modalidade = objeto.getString("id_modalidade");
+                                        duracao = objeto.getString("duracao");
+
+                                        curso = new CursoTecnico(curso, modalidade, duracao);
+                                        break;
+                                    case "G":
+                                        modalidade = objeto.getString("id_modalidade");
+                                        titulacao = objeto.getString("titulacao");
+                                        duracao = objeto.getString("duracao");
+                                        notaMec = objeto.getString("nota_avaliacao");
+
+                                        curso = new CursoGraduacao(curso, modalidade, titulacao, duracao, notaMec);
+                                        break;
+                                    case "P":
+                                        modalidade = objeto.getString("id_modalidade");
+                                        status = objeto.getString("estado");
+                                        duracao = objeto.getString("duracao");
+                                        notaMec = objeto.getString("nota_avaliacao");
+
+                                        curso = new CursoGraduacao(curso, modalidade, status, duracao, notaMec);
+                                        break;
+                                }
                                 lista.add(curso);
                                 listaQuery.add(curso);
                             }

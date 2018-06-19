@@ -13,9 +13,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 
 import br.com.seocursos.seocursos.ConstClasses.Evento;
-import br.com.seocursos.seocursos.ConstClasses.Usuario;
 import br.com.seocursos.seocursos.Outros.CRUD;
 import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
@@ -54,6 +53,8 @@ public class EventosActivity extends AppCompatActivity implements SearchView.OnQ
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_eventos);
+
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         pd = new ProgressDialogHelper(EventosActivity.this);
         helper = new SharedPreferencesHelper(EventosActivity.this);
@@ -115,9 +116,8 @@ public class EventosActivity extends AppCompatActivity implements SearchView.OnQ
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.setHeaderTitle("Selecione a Ação");
-        menu.add(0, v.getId(), 0, "Editar");
-        menu.add(0, v.getId(), 0, "Excluir");
+        menu.setHeaderTitle(getResources().getString(R.string.selecioneAcao));
+        getMenuInflater().inflate(R.menu.edit_menu, menu);
     }
 
     @Override
@@ -127,16 +127,16 @@ public class EventosActivity extends AppCompatActivity implements SearchView.OnQ
         Evento evento = listaQuery.get(pos);
         final String id = evento.getId();
 
-        if (item.getTitle() == "Editar") {
+        if (item.getItemId() == R.id.editar) {
             Intent i = new Intent(EventosActivity.this, EditEventoActivity.class);
             i.putExtra("id", id);
             startActivity(i);
         }
-        if (item.getTitle() == "Excluir") {
+        if (item.getItemId() == R.id.excluir) {
             AlertDialog.Builder builder = new AlertDialog.Builder(EventosActivity.this);
             builder.setCancelable(true);
-            builder.setTitle("Deseja excluir esse registro?");
-            builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+            builder.setTitle(getResources().getString(R.string.desejaExcluirRegistro));
+            builder.setPositiveButton(getResources().getString(R.string.sim), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     Map<String, String> params = new HashMap<String, String>();
@@ -147,9 +147,10 @@ public class EventosActivity extends AppCompatActivity implements SearchView.OnQ
                     rq.add(sr);
                     lv.setAdapter(null);
                     lista.clear();
+                    listaQuery.clear();
                     carregar();
                 }
-            }).setNegativeButton("Não", null);
+            }).setNegativeButton(getResources().getString(R.string.nao), null);
             builder.create().show();
         }
         return true;

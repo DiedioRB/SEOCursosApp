@@ -12,7 +12,7 @@ import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -31,6 +31,9 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,11 +48,15 @@ public class EditUsuarioActivity extends AppCompatActivity {
     private static final int GALLERY_REQUEST = 1;
     private Bitmap imagem = null;
     private String image;
+    private String privilegio = "A";
 
-    TextInputEditText nome, email, cpf, cep, endereco, numero, cidade, estado, telefone;
-    RadioGroup sexo, modalidade;
+    TextInputEditText nome, email, cpf, cep, endereco, numero, cidade, estado;
+    RadioGroup sexo;
     Button btn;
     NetworkImageView foto;
+
+    LinearLayout formAluno, formTutor;
+    TextInputEditText telUsuario, telRes, telCel, dataNascimento, curso, instituicao, anoConclusao;
 
     ProgressDialogHelper pd;
 
@@ -69,20 +76,33 @@ public class EditUsuarioActivity extends AppCompatActivity {
         numero = (TextInputEditText) findViewById(R.id.numeroUsuario);
         cidade = (TextInputEditText) findViewById(R.id.cidadeUsuario);
         estado = (TextInputEditText) findViewById(R.id.estadoUsuario);
-        telefone = (TextInputEditText) findViewById(R.id.telUsuario);
         sexo = (RadioGroup) findViewById(R.id.sexoUsuario);
-        modalidade = (RadioGroup) findViewById(R.id.modalidadeUsuario);
         btn = (Button) findViewById(R.id.confirmarUsuario);
+
+        formAluno = findViewById(R.id.formAluno);
+        formTutor = findViewById(R.id.formTutor);
+
+        telUsuario = findViewById(R.id.telUsuario);
+        telRes = findViewById(R.id.telResidencial);
+        telCel = findViewById(R.id.telCelular);
+        dataNascimento = findViewById(R.id.dataNascimento);
+        curso = findViewById(R.id.curso);
+        instituicao = findViewById(R.id.instituicao);
+        anoConclusao = findViewById(R.id.anoConclusao);
 
         //Aplica máscara
         MaskEditTextChangedListener maskCPF = new MaskEditTextChangedListener("###.###.###-##", cpf);
         MaskEditTextChangedListener maskCEP = new MaskEditTextChangedListener("##.###-###", cep);
+        MaskEditTextChangedListener maskData = new MaskEditTextChangedListener("##/##/####",dataNascimento);
 
         cpf.addTextChangedListener(maskCPF);
         cep.addTextChangedListener(maskCEP);
+        dataNascimento.addTextChangedListener(maskData);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            telefone.addTextChangedListener(new PhoneNumberFormattingTextWatcher("BR"));
+            telUsuario.addTextChangedListener(new PhoneNumberFormattingTextWatcher("BR"));
+            telRes.addTextChangedListener(new PhoneNumberFormattingTextWatcher("BR"));
+            telCel.addTextChangedListener(new PhoneNumberFormattingTextWatcher("BR"));
         }
         foto = findViewById(R.id.userImage);
 
@@ -111,7 +131,6 @@ public class EditUsuarioActivity extends AppCompatActivity {
                 params.put("numero", numero.getText().toString());
                 params.put("cidade", cidade.getText().toString());
                 params.put("estado", estado.getText().toString());
-                params.put("tel", telefone.getText().toString());
 
                 if(imagem != null) {
                     String imagemUsuario = getStringImage(imagem);
@@ -121,20 +140,35 @@ public class EditUsuarioActivity extends AppCompatActivity {
                     params.put("foto", image);
                 }
 
-                String sexoS, modalidadeS;
+                String sexoS;
                 if (sexo.getCheckedRadioButtonId() == R.id.masculinoUsuario) {
                     sexoS = "M";
                 } else {
                     sexoS = "F";
                 }
-                if (modalidade.getCheckedRadioButtonId() == R.id.semipresencialUsuario) {
-                    modalidadeS = "1";
-                } else {
-                    modalidadeS = "2";
+                params.put("sexo", sexoS);
+
+                switch(privilegio){
+                    case "A":
+                        params.put("tipoUsuario", "A");
+
+                        params.put("telUsuario", telUsuario.getText().toString());
+                        break;
+                    case "T":
+                        params.put("tipoUsuario", "T");
+
+                        params.put("dataNascimento", dataNascimento.getText().toString());
+                        params.put("telRes", telRes.getText().toString());
+                        params.put("telCel", telCel.getText().toString());
+                        params.put("curso", curso.getText().toString());
+                        params.put("instituicao", instituicao.getText().toString());
+                        params.put("anoConclusao", anoConclusao.getText().toString());
+                        break;
+                    case "D":
+                        params.put("tipoUsuario", "D");
+                        break;
                 }
 
-                params.put("sexo", sexoS);
-                params.put("modalidade", modalidadeS);
                 StringRequest sr = CRUD.editar(JSON_URL, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -142,9 +176,9 @@ public class EditUsuarioActivity extends AppCompatActivity {
                             JSONObject jo = new JSONObject(response);
                             boolean enviado = jo.getBoolean("resposta");
                             if (enviado) {
-                                Toast.makeText(EditUsuarioActivity.this, "Editado com sucesso!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditUsuarioActivity.this, getResources().getString(R.string.editadoComSucesso), Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(EditUsuarioActivity.this, "Falha na edição!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditUsuarioActivity.this, getResources().getString(R.string.falhaEdicao), Toast.LENGTH_SHORT).show();
                             }
                             Intent i = new Intent(EditUsuarioActivity.this, UsuariosActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -178,7 +212,7 @@ public class EditUsuarioActivity extends AppCompatActivity {
                         btn.setClickable(false);
                         btn.setBackgroundColor(getResources().getColor(R.color.lightGrey));
                         btn.setTextColor(getResources().getColor(R.color.darkGrey));
-                        Toast.makeText(EditUsuarioActivity.this, "CPF Inválido!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EditUsuarioActivity.this, getResources().getString(R.string.cpfInvalido), Toast.LENGTH_SHORT).show();
                     } else {
                         btn.setClickable(true);
                         btn.setBackgroundColor(getResources().getColor(R.color.blueAccent2));
@@ -221,7 +255,7 @@ public class EditUsuarioActivity extends AppCompatActivity {
                             btn.setClickable(false);
                             btn.setBackgroundColor(getResources().getColor(R.color.lightGrey));
                             btn.setTextColor(getResources().getColor(R.color.darkGrey));
-                            Toast.makeText(EditUsuarioActivity.this, "CEP Inválido!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(EditUsuarioActivity.this, getResources().getString(R.string.cepInvalido), Toast.LENGTH_SHORT).show();
                         }
                     });
                     RequestQueue rq = VolleySingleton.getInstance(EditUsuarioActivity.this).getRequestQueue();
@@ -256,7 +290,7 @@ public class EditUsuarioActivity extends AppCompatActivity {
                 foto.setImageBitmap(imagem);
             }catch(FileNotFoundException e){
                 e.printStackTrace();
-                Toast.makeText(this, "Erro ao receber a imagem: Imagem não encontrada!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getResources().getString(R.string.imagemNaoEncontrada), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -272,13 +306,48 @@ public class EditUsuarioActivity extends AppCompatActivity {
                         JSONArray ja = jo.getJSONArray("usuario");
                         JSONObject objeto = ja.getJSONObject(0);
 
-                        String idO = objeto.getString("id_usuario"), numeroO = objeto.getString("numero");
+                        String idO = objeto.getString("idUsuario"), numeroO = objeto.getString("numero");
                         String nomeO = objeto.getString("nome"), emailO = objeto.getString("email"),
                                 fotoO = objeto.getString("foto"), cpfO = objeto.getString("cpf"),
                                 cepO = objeto.getString("cep"), enderecoO = objeto.getString("endereco"),
                                 cidadeO = objeto.getString("cidade"), estadoO = objeto.getString("estado"),
                                 sexoO = objeto.getString("sexo"), tipoUsuarioO = objeto.getString("tipo_usuario");
-                        String telefoneO = objeto.getString("telefone");
+
+                        String telAluno = objeto.getString("telefone");
+                        String dataNascimentoO = objeto.getString("nascimento"), telResidencial = objeto.getString("tel_residencial"),
+                                telCelular = objeto.getString("tel_celular"), nomeCurso = objeto.getString("nome_curso"),
+                                nomeInstituicao = objeto.getString("nome_instituicao"), anoConclusaoTutor = objeto.getString("ano_conclusao");
+
+                        privilegio = tipoUsuarioO;
+                        switch(privilegio){
+                            case "A":
+                                formAluno.setVisibility(View.VISIBLE);
+                                formTutor.setVisibility(View.GONE);
+
+                                telUsuario.setText(telAluno);
+                                break;
+                            case "T":
+                                formAluno.setVisibility(View.GONE);
+                                formTutor.setVisibility(View.VISIBLE);
+
+                                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                                ParsePosition pos = new ParsePosition(0);
+                                Date data = format.parse(dataNascimentoO,pos);
+                                format = new SimpleDateFormat("dd/MM/yyyy");
+                                String nascimento = format.format(data);
+
+                                dataNascimento.setText(nascimento);
+                                telRes.setText(telResidencial);
+                                telCel.setText(telCelular);
+                                curso.setText(nomeCurso);
+                                instituicao.setText(nomeInstituicao);
+                                anoConclusao.setText(anoConclusaoTutor);
+                                break;
+                            case "D":
+                                formAluno.setVisibility(View.GONE);
+                                formTutor.setVisibility(View.GONE);
+                                break;
+                        }
 
                         nome.setText(nomeO);
                         email.setText(emailO);
@@ -288,7 +357,6 @@ public class EditUsuarioActivity extends AppCompatActivity {
                         numero.setText(numeroO);
                         cidade.setText(cidadeO);
                         estado.setText(estadoO);
-                        telefone.setText(telefoneO);
 
                         image = fotoO;
 

@@ -54,7 +54,7 @@ public class EditEnqueteActivity extends AppCompatActivity {
         }catch(NullPointerException e){
             e.printStackTrace();
             Intent i = new Intent(EditEnqueteActivity.this,EnquetesActivity.class);
-            Toast.makeText(getApplicationContext(), "Nenhum registro enviado!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.nenhumRegistroEnviado), Toast.LENGTH_SHORT).show();
             startActivity(i);
         }
 
@@ -65,7 +65,7 @@ public class EditEnqueteActivity extends AppCompatActivity {
                 Map<String,String> params = new HashMap<String,String>();
 
                 params.put("id_enquete", id);
-                params.put("pergunta", pergunta.getText().toString());
+                params.put("questao", pergunta.getText().toString());
                 params.put("valorA", respostaA.getText().toString());
                 params.put("valorB", respostaB.getText().toString());
                 params.put("valorC", respostaC.getText().toString());
@@ -79,9 +79,9 @@ public class EditEnqueteActivity extends AppCompatActivity {
                         JSONObject jo = new JSONObject(response);
                         boolean enviado = jo.getBoolean("resposta");
                         if(enviado) {
-                            Toast.makeText(EditEnqueteActivity.this, "Cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(EditEnqueteActivity.this, getResources().getString(R.string.editadoComSucesso), Toast.LENGTH_SHORT).show();
                         }else{
-                            Toast.makeText(EditEnqueteActivity.this, "Falha no cadastro!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(EditEnqueteActivity.this, getResources().getString(R.string.falhaEdicao), Toast.LENGTH_SHORT).show();
                         }
                         Intent i = new Intent(EditEnqueteActivity.this, EnquetesActivity.class);
                         startActivity(i);

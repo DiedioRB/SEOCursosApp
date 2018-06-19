@@ -26,6 +26,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import br.com.seocursos.seocursos.ConstClasses.Curso;
+import br.com.seocursos.seocursos.ConstClasses.CursoGraduacao;
+import br.com.seocursos.seocursos.ConstClasses.CursoGratis;
+import br.com.seocursos.seocursos.ConstClasses.CursoTecnico;
 import br.com.seocursos.seocursos.ConstClasses.Disciplina;
 import br.com.seocursos.seocursos.Outros.CRUD;
 import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
@@ -33,15 +36,22 @@ import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 public class EditDisciplinaActivity extends AppCompatActivity {
     private static final String JSON_URL = "https://www.seocursos.com.br/PHP/Android/disciplinas.php";
     private String id;
+
     TextInputEditText nome,cargaHoraria,duracao,area;
     RadioGroup nivel,modalidade;
-    Spinner cursos;
+    Spinner cursos,tutores;
     Button btn;
 
-    ArrayAdapter<String> adapter;
+    ArrayAdapter<String> adapterCursos;
+    ArrayAdapter<String> adapterTutores;
     ArrayList<Curso> listaCursos;
+    ArrayList<String> listaTutores;
 
-    String idCurso;
+    private String idCurso;
+    private String idTutor;
+    private int spinnerSelectCurso = 0;
+    private int spinnerSelectTutor = 0;
+
     ProgressDialogHelper pd;
 
     @Override
@@ -57,7 +67,7 @@ public class EditDisciplinaActivity extends AppCompatActivity {
             id = intent.getStringExtra("id");
         }catch(NullPointerException e){
             e.printStackTrace();
-            Toast.makeText(EditDisciplinaActivity.this, "Disciplina não encontrada!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(EditDisciplinaActivity.this, getResources().getString(R.string.disciplina), Toast.LENGTH_SHORT).show();
             Intent i = new Intent(EditDisciplinaActivity.this, DisciplinasActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(i);
@@ -72,12 +82,24 @@ public class EditDisciplinaActivity extends AppCompatActivity {
         modalidade = findViewById(R.id.modalidade);
         btn = findViewById(R.id.confirmar);
 
-        adapter = new ArrayAdapter<String>(EditDisciplinaActivity.this, R.layout.support_simple_spinner_dropdown_item);
+        adapterCursos = new ArrayAdapter<String>(EditDisciplinaActivity.this, R.layout.support_simple_spinner_dropdown_item);
+        adapterTutores = new ArrayAdapter<String>(EditDisciplinaActivity.this, R.layout.support_simple_spinner_dropdown_item);
         cursos = findViewById(R.id.cursos);
+        tutores = findViewById(R.id.tutores);
         listaCursos = new ArrayList<Curso>();
+        listaTutores = new ArrayList<String>();
 
         carregar();
-        cursos.setAdapter(adapter);
+        cursos.setAdapter(adapterCursos);
+        tutores.setAdapter(adapterTutores);
+
+        tutores.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                cursos.setSelection(spinnerSelectCurso);
+                tutores.setSelection(spinnerSelectTutor);
+            }
+        }, 900);
 
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,6 +142,10 @@ public class EditDisciplinaActivity extends AppCompatActivity {
                 Curso curso = listaCursos.get(cursos.getSelectedItemPosition());
                 idCurso = curso.getId();
                 params.put("idCurso", idCurso);
+
+                String idTutor = listaTutores.get(tutores.getSelectedItemPosition());
+                params.put("idTutor", idTutor);
+
                 StringRequest sr = CRUD.editar(JSON_URL, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -127,9 +153,9 @@ public class EditDisciplinaActivity extends AppCompatActivity {
                             JSONObject jo = new JSONObject(response);
                             boolean enviado = jo.getBoolean("resposta");
                             if(enviado) {
-                                Toast.makeText(EditDisciplinaActivity.this, "Cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditDisciplinaActivity.this, getResources().getString(R.string.editadoComSucesso), Toast.LENGTH_SHORT).show();
                             }else{
-                                Toast.makeText(EditDisciplinaActivity.this, "Falha no cadastro!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditDisciplinaActivity.this, getResources().getString(R.string.falhaEdicao), Toast.LENGTH_SHORT).show();
                             }
                             Intent i = new Intent(EditDisciplinaActivity.this, DisciplinasActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -152,8 +178,8 @@ public class EditDisciplinaActivity extends AppCompatActivity {
     }
     public void carregar(){
         pd.open();
-        String url = "https://seocursos.com.br/PHP/Android/cursos.php";
-        RequestQueue rq = VolleySingleton.getInstance(EditDisciplinaActivity.this).getRequestQueue();
+        final String url = "https://seocursos.com.br/PHP/Android/cursos.php";
+        final RequestQueue rq = VolleySingleton.getInstance(EditDisciplinaActivity.this).getRequestQueue();
         rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
             @Override
             public void onRequestFinished(Request<Object> request) {
@@ -171,11 +197,14 @@ public class EditDisciplinaActivity extends AppCompatActivity {
                     Disciplina disciplina = new Disciplina(objeto.getString("id_disciplina"), objeto.getString("nome_disciplina"),
                     objeto.getString("nivel"), objeto.getString("carga_horaria"),objeto.getString("area"),
                             objeto.getString("duracao"),objeto.getString("id_modalidade"),objeto.getString("id_curso"),
-                            objeto.getString("nome_curso"));
+                            objeto.getString("nome_curso"), objeto.getString("id_usuario"));
                     nome.setText(disciplina.getNome());
                     cargaHoraria.setText(disciplina.getCargaHoraria());
                     duracao.setText(disciplina.getDuracao());
                     area.setText(disciplina.getArea());
+
+                    idCurso = disciplina.getIdCurso();
+                    idTutor = disciplina.getIdTutor();
 
                     switch(disciplina.getNivel()){
                         case "F":
@@ -209,26 +238,60 @@ public class EditDisciplinaActivity extends AppCompatActivity {
             }
         },EditDisciplinaActivity.this, id);
         rq.add(sr);
-        sr = CRUD.selecionar(url, new Response.Listener<String>() {
+        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
             @Override
-            public void onResponse(String response) {
-                try {
-                    JSONObject jo = new JSONObject(response);
-                    JSONArray ja = jo.getJSONArray("cursos");
-                    for(Integer i=0;i<ja.length();i++){
-                        JSONObject objeto = ja.getJSONObject(i);
-                        Curso curso = new Curso(objeto.getString("id_curso"),objeto.getString("nome_curso"),null,null,null,null,null,null);
-                        listaCursos.add(curso);
-                        adapter.add(curso.getNome());
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }catch(NullPointerException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, getApplicationContext());
+            public void onRequestFinished(Request<Object> request) {
+                rq.removeRequestFinishedListener(this);
+                StringRequest sr = CRUD.selecionar(url, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jo = new JSONObject(response);
+                            JSONArray ja = jo.getJSONArray("cursos");
+                            for(Integer i=0;i<ja.length();i++){
+                                JSONObject objeto = ja.getJSONObject(i);
+                                Curso curso = new Curso(objeto.getString("idCurso"),objeto.getString("nome_curso"),
+                                        null,null,null,null,null,null);
+                                listaCursos.add(curso);
+                                adapterCursos.add(curso.getNome());
 
-        rq.add(sr);
+                                if(idCurso.equals(curso.getId())){
+                                    spinnerSelectCurso = adapterCursos.getPosition(curso.getNome());
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }catch(NullPointerException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, getApplicationContext());
+                rq.add(sr);
+
+                Map<String,String> params = new HashMap<>();
+                params.put("getTutores", "getTutores");
+                sr = CRUD.customRequest(JSON_URL, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jo = new JSONObject(response);
+                            JSONArray ja = jo.getJSONArray("tutores");
+                            for(int i=0;i<ja.length();i++){
+                                JSONObject objeto = ja.getJSONObject(i);
+                                listaTutores.add(objeto.getString("idUsuario"));
+                                adapterTutores.add(objeto.getString("nome"));
+
+                                if(idTutor.equals(objeto.getString("idUsuario"))){
+                                    spinnerSelectTutor = adapterTutores.getPosition(objeto.getString("nome"));
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, EditDisciplinaActivity.this, params);
+                rq.add(sr);
+            }
+        });
     }
 }

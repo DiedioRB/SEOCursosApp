@@ -50,4 +50,14 @@ public class Curso{
         this.descricao = descricao;
         this.tipo = tipo;
     }
+    public Curso(Curso curso){
+        this.id = curso.getId();
+        this.nome = curso.getNome();
+        this.preco = curso.getPreco();
+        this.area = curso.getArea();
+        this.cargaHoraria = curso.getCargaHoraria();
+        this.preRequisito = curso.getPreRequisito();
+        this.descricao = curso.getDescricao();
+        this.tipo = curso.getTipo();
+    }
 }

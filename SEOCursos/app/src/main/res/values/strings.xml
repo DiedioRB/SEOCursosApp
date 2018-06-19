@@ -1,13 +1,17 @@
 <resources>
     <string name="app_name">SEO Cursos</string>
-    <string name="facebook_app_id">1530907060331272</string>
-    <string name="fb_login_protocol_scheme">fb1530907060331272</string>
+    <string name="facebook_app_id" translatable="false">1530907060331272</string>
+    <string name="fb_login_protocol_scheme" translatable="false">fb1530907060331272</string>
 
     <string name="fazerLogin">Fazer Login</string>
     <string name="minhaConta">Minha Conta</string>
     <string name="sair">Sair</string>
     <string name="cadastreSeAqui">Cadastre-se Aqui!</string>
     <string name="esqueciMinhaSenha">Esqueci Minha Senha</string>
+    <string name="editar">Editar</string>
+    <string name="excluir">Excluir</string>
+    <string name="selecioneAcao">Selecione a Ação</string>
+    <string name="cancelar">Cancelar</string>
 
     <!--Páginas para acesso-->
     <string name="cursos">Cursos</string>
@@ -16,9 +20,10 @@
     <string name="tarefas">Tarefas</string>
     <string name="eventos">Eventos</string>
     <string name="enquetes">Enquetes</string>
-    <string name="videoAulas">Video Aulas</string>
-    <string name="chat">Chat</string>
-    <string name="ebooks">E-books</string>
+    <string name="videoAulas">Vídeo-Aulas</string>
+    <string name="chat" translatable="false">Chat</string>
+    <string name="ebooks" translatable="false">E-books</string>
+    <string name="meusCursos">Meus Cursos</string>
 
     <!--Título das Páginas-->
     <string name="novoCurso">Novo Curso</string>
@@ -39,11 +44,11 @@
     <string name="nome">Nome</string>
     <string name="senha">Senha</string>
     <string name="confirmarSenha">Confirmar Senha</string>
-    <string name="email">E-mail</string>
+    <string name="email" translatable="false">E-mail</string>
     <string name="sexo">Sexo</string>
     <string name="masculino">Masculino</string>
     <string name="feminino">Feminino</string>
-    <string name="cpf">CPF</string>
+    <string name="cpf" translatable="false">CPF</string>
     <string name="cep">CEP</string>
     <string name="endereco">Endereço</string>
     <string name="numero">Número</string>
@@ -55,10 +60,27 @@
     <string name="semipresencial">Semipresencial</string>
     <string name="ead">EaD</string>
     <string name="dataNascimento">Data de Nascimento</string>
+    <string name="telefoneResidencial">Telefone Residencial</string>
+    <string name="telefoneCelular">Telefone Celular</string>
+    <string name="instituicao">Instituição</string>
+    <string name="anoDeConclusao">Ano de Conclusão</string>
+
+    <string name="aluno">Aluno</string>
+    <string name="tutor">Tutor</string>
+    <string name="administrador">Administrador</string>
+    <string name="selecioneOPrivilegio">Selecione o privilégio</string>
 
     <!--Inputs de Curso-->
     <string name="preRequisito">Pré-requisitos</string>
     <string name="informacoesDoCurso">Informações do Curso</string>
+    <string name="disponivelAte">Disponível até</string>
+    <string name="licenciado">Licenciado</string>
+    <string name="bacharel">Bacharel</string>
+    <string name="titulacao">Titulação</string>
+    <string name="status" translatable="false">Status</string>
+    <string name="latoSensu" translatable="false">Lato Sensu</string>
+    <string name="strictuSensu" translatable="false">Stricto Sensu</string>
+    <string name="notaMec">Nota MEC</string>
 
     <!--Inputs de Tarefa-->
     <string name="descricao">Descrição</string>
@@ -66,6 +88,16 @@
     <string name="resposta">Resposta</string>
     <string name="respostas">Respostas</string>
     <string name="responderTarefa">Responder Tarefa</string>
+    <string name="nota">Nota</string>
+
+    <string name="parcial1">Parcial 1</string>
+    <string name="parcial2">Parcial 2</string>
+    <string name="parcial3">Parcial 3</string>
+    <string name="parcial4">Parcial 4</string>
+    <string name="parcial5">Parcial 5</string>
+    <string name="recuperacao">Recuperação</string>
+
+    <string name="desejaResponderATarefa">Deseja responder a tarefa?</string>
 
     <!--Inputs de Disciplina-->
     <string name="nivel">Nível</string>
@@ -77,6 +109,7 @@
     <string name="duracao">Duração (Semestres)</string>
     <string name="area">Área</string>
     <string name="curso">Curso</string>
+    <string name="menuDisciplina">Menu da Disciplina</string>
 
     <!--Inputs de Enquete-->
     <string name="pergunta">Pergunta</string>
@@ -85,6 +118,7 @@
     <string name="respostaC">Resposta C</string>
     <string name="respostaD">Resposta D</string>
     <string name="respostaE">Resposta E</string>
+    <string name="resultado">Resultado</string>
 
     <!--Inputs de Evento-->
     <string name="local">Local</string>
@@ -107,6 +141,7 @@
     <string name="preRequisitosInfo">Pré-requisitos:</string>
     <string name="inscreverSe">Inscrever-se</string>
     <string name="voltar">Voltar</string>
+    <string name="falhaAoConfirmarVisualizacao">Falha ao confirmar visualização!</string>
 
     <!--Gráficos-->
     <string name="graficos">Gráficos</string>
@@ -114,6 +149,56 @@
     <string name="inadimplentes">Inadimplentes</string>
     <string name="relatorioDeMensalidades">Relatório de Mensalidades</string>
     <string name="relatorioDeInadimplentes">Relatório de Inadimplentes</string>
+    <string name="fazendoDownloadDe">Fazendo download de</string>
+    <string name="eNecessarioGarantirPermissao">É necessário garantir permissão para download dos relatórios!</string>
+
+    <!--Outros-->
+    <string name="ler">Ler</string>
+    <string name="assistir">Assistir</string>
+
+    <!--Alertas-->
+    <string name="cadastradoComSucesso">Cadastrado com sucesso!</string>
+    <string name="falhaCadastro">Falha no cadastro!</string>
+    <string name="editadoComSucesso">Editado com sucesso!</string>
+    <string name="falhaEdicao">Falha na edição!</string>
+    <string name="enviadoComSucesso">Enviado com sucesso!</string>
+    <string name="falhaEnvio">Falha no envio!</string>
+    <string name="excluidoComSucesso">Excluído com sucesso!</string>
+    <string name="falhaExclusao">Falha na exclusão!</string>
+
+    <string name="cpfInvalido">CPF Inválido!</string>
+    <string name="cepInvalido">CEP Inválido!</string>
+
+    <string name="desejaExcluirRegistro">Deseja excluir o registro?</string>
+    <string name="confirmarInscricao">Confirmar inscrição</string>
+    <string name="desejaCadastrarSeEm">Deseja cadastrar-se em</string>
+    <string name="sim">Sim</string>
+    <string name="nao">Não</string>
+
+    <string name="nenhumRegistroEnviado">Nenhum registro enviado!</string>
+    <string name="imagemNaoEncontrada">Imagem não encontrada!</string>
+    <string name="videoAulaNaoEncontrada">Vídeo-aula não encontrada!</string>
+    <string name="cursoNaoEncontrado">Curso não encontrado!</string>
+    <string name="disciplinaNaoEncontrada">Disciplina não encontrada!</string>
+    <string name="eventoNaoEncontrado">Evento não encontrado!</string>
+    <string name="usuarioNaoEncontrado">Usuário não encontrado!</string>
+    <string name="enqueteNaoEncontrada">Enquete não encontrada!</string>
+    <string name="tarefaNaoEncontrada">Tarefa não encontrada!</string>
+
+    <string name="voceJaEstaOnline">Você já está online!</string>
+    <string name="preenchaOsCamposPrimeiro">Preencha os campos primeiro!</string>
+    <string name="recuperacaoDeSenha">Recuperação de senha</string>
+    <string name="digiteUmEmailValido">Digite um e-mail válido!</string>
+    <string name="erroAoCarregarMenu">Erro ao carregar o menu!</string>
+    <string name="selecioneUmaParcialPrimeiro">Selecione uma parcial primeiro!</string>
+    <string name="valorDeNotaInvalido">Valor de nota inválido!</string>
+
+    <string name="aguarde">Aguarde...</string>
+
+    <string name="mensagemRecuperacaoSenha">
+        Uma mensagem foi enviada ao seu e-mail!
+        Você tem uma semana para recuperar a senha!
+    </string>
 
     <string name="asset_statements" translatable="false">[{\n  \"relation\": [\"delegate_permission/common.handle_all_urls\"],\n  \"target\": {\n    \"namespace\": \"web\",\n    \"site\": \"https://seocursos.com.br\",\n  }\n}]</string>
 </resources>
