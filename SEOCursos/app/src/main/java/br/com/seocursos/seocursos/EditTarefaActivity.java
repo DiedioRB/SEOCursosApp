@@ -116,12 +116,12 @@ public class EditTarefaActivity extends AppCompatActivity {
         carregar();
 
         spinner.setAdapter(adapter);
-        spinner.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                spinner.setSelection(spinnerSelect);
-            }
-        }, 900);
+    //    spinner.postDelayed(new Runnable() {
+    //        @Override
+    //        public void run() {
+    //            spinner.setSelection(spinnerSelect);
+    //        }
+    //    }, 900);
     }
     public void carregar(){
         pd.open();
@@ -175,6 +175,13 @@ public class EditTarefaActivity extends AppCompatActivity {
             public void onRequestFinished(Request<Object> request) {
                 rq.add(cursosRequest);
                 rq.removeRequestFinishedListener(this);
+                rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                    @Override
+                    public void onRequestFinished(Request<Object> request) {
+                        rq.removeRequestFinishedListener(this);
+                        spinner.setSelection(spinnerSelect);
+                    }
+                });
                 pd.close();
             }
         });

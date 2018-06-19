@@ -1,7 +1,9 @@
 package br.com.seocursos.seocursos;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -54,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
     SharedPreferencesHelper helper;
 
     ProgressDialogHelper pd;
+    ConnectivityManager connectivityManager;
 
     CallbackManager callbackManager;
     LoginButton loginButton;
@@ -65,6 +68,9 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
         //Login com Google
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail().build();
@@ -104,11 +110,16 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onCancel() {
-                // App code
+                if(!checkInternet()){
+                    Toast.makeText(LoginActivity.this, getResources().getString(R.string.semConexaoComAInternet), Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
             public void onError(FacebookException exception) {
+                if(!checkInternet()){
+                    Toast.makeText(LoginActivity.this, getResources().getString(R.string.semConexaoComAInternet), Toast.LENGTH_SHORT).show();
+                }
                 exception.printStackTrace();
             }
         });
@@ -136,16 +147,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
-        senha.setOnEditorActionListener(new EditText.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE || event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                    btn.performClick();
-                    return true;
-                }
-                return false;
-            }
-        });
     }
     @Override
     public void onStart(){
@@ -154,111 +155,139 @@ public class LoginActivity extends AppCompatActivity {
         googleLogin(account);
     }
 
-    public void fazerLogin(){
+    public boolean checkInternet(){
         pd.open();
-        Map<String,String> params = new HashMap<String,String>();
-        params.put("login", "login");
-        params.put("email", email.getText().toString());
-        params.put("senha", senha.getText().toString());
+        boolean is3G = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnectedOrConnecting();
+        boolean isWifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting();
 
-        StringRequest sr = CRUD.customRequest(JSON_URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try{
-                    JSONObject jo = new JSONObject(response);
-                    boolean encontrado = jo.getBoolean("resposta");
-                    if(encontrado){
-                        String id,nome,email,foto,sexo,tipoUsuario,cpf,cep,endereco,cidade,estado;
-                        int numero;
-                        JSONObject objeto = jo.getJSONObject("dados");
+        boolean retorno;
 
-                        id = objeto.getString("id");
-                        nome = objeto.getString("nome");
-                        email = objeto.getString("email");
-                        foto = objeto.getString("foto");
-                        sexo = objeto.getString("sexo");
-                        tipoUsuario = objeto.getString("tipo_usuario");
-                        cpf = objeto.getString("cpf");
-                        cep = objeto.getString("cep");
-                        endereco = objeto.getString("endereco");
-                        numero = objeto.getInt("numero");
-                        cidade = objeto.getString("cidade");
-                        estado = objeto.getString("estado");
+        if(!(is3G || isWifi)){
+            retorno = false;
+        }else{
+            retorno = true;
+        }
+        pd.close();
+        return retorno;
+    }
 
-                        Usuario usuario = new Usuario(id, nome,email,foto,sexo,tipoUsuario,cpf,cep,endereco,numero,cidade,estado);
+    public void fazerLogin(){
+        if(checkInternet()) {
+            pd.open();
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("login", "login");
+            params.put("email", email.getText().toString());
+            params.put("senha", senha.getText().toString());
 
-                        //os parâmetros para sesão são login(b), id, nome, email, privilegio
-                        helper.setBoolean("login", true);
-                        helper.setString("id", id);
-                        helper.setString("nome", nome);
-                        helper.setString("email", email);
-                        helper.setString("privilegio", tipoUsuario);
+            StringRequest sr = CRUD.customRequest(JSON_URL, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    try {
+                        JSONObject jo = new JSONObject(response);
+                        boolean encontrado = jo.getBoolean("resposta");
+                        if (encontrado) {
+                            String id, nome, email, foto, sexo, tipoUsuario, cpf, cep, endereco, cidade, estado;
+                            int numero;
+                            JSONObject objeto = jo.getJSONObject("dados");
 
-                        Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(i);
-                    }else{
-                        String errorMessage = jo.getString("error");
-                        Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                            id = objeto.getString("id");
+                            nome = objeto.getString("nome");
+                            email = objeto.getString("email");
+                            foto = objeto.getString("foto");
+                            sexo = objeto.getString("sexo");
+                            tipoUsuario = objeto.getString("tipo_usuario");
+                            cpf = objeto.getString("cpf");
+                            cep = objeto.getString("cep");
+                            endereco = objeto.getString("endereco");
+                            numero = objeto.getInt("numero");
+                            cidade = objeto.getString("cidade");
+                            estado = objeto.getString("estado");
+
+                            Usuario usuario = new Usuario(id, nome, email, foto, sexo, tipoUsuario, cpf, cep, endereco, numero, cidade, estado);
+
+                            //os parâmetros para sesão são login(b), id, nome, email, privilegio
+                            helper.setBoolean("login", true);
+                            helper.setString("id", id);
+                            helper.setString("nome", nome);
+                            helper.setString("email", email);
+                            helper.setString("privilegio", tipoUsuario);
+
+                            Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(i);
+                        } else {
+                            String errorMessage = jo.getString("error");
+                            Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-
-                }catch(JSONException e){
-                    e.printStackTrace();
                 }
-            }
-        }, LoginActivity.this, params);
-        RequestQueue rq = VolleySingleton.getInstance(LoginActivity.this).getRequestQueue();
-        rq.add(sr);
-        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
-            @Override
-            public void onRequestFinished(Request<Object> request) {
-                pd.close();
-            }
-        });
+            }, LoginActivity.this, params);
+            RequestQueue rq = VolleySingleton.getInstance(LoginActivity.this).getRequestQueue();
+            rq.add(sr);
+            rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                @Override
+                public void onRequestFinished(Request<Object> request) {
+                    pd.close();
+                }
+            });
+        }else{
+            Toast.makeText(this, getResources().getString(R.string.semConexaoComAInternet), Toast.LENGTH_SHORT).show();
+        }
     }
     public void fazerLogin(String email){
-        Map<String,String> params = new HashMap<String,String>();
-        params.put("emailLogin", "emailLogin");
-        params.put("email", email);
+        if(checkInternet()) {
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("emailLogin", "emailLogin");
+            params.put("email", email);
 
-        StringRequest sr = CRUD.customRequest(JSON_URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try{
-                    JSONObject jo = new JSONObject(response);
-                    boolean encontrado = jo.getBoolean("resposta");
-                    if(encontrado) {
-                        JSONObject objeto = jo.getJSONObject("dados");
-                        String id = objeto.getString("id");
-                        String nome = objeto.getString("nome");
-                        String email = objeto.getString("email");
-                        String tipoUsuario = objeto.getString("tipo_usuario");
+            StringRequest sr = CRUD.customRequest(JSON_URL, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    try {
+                        JSONObject jo = new JSONObject(response);
+                        boolean encontrado = jo.getBoolean("resposta");
+                        if (encontrado) {
+                            JSONObject objeto = jo.getJSONObject("dados");
+                            String id = objeto.getString("id");
+                            String nome = objeto.getString("nome");
+                            String email = objeto.getString("email");
+                            String tipoUsuario = objeto.getString("tipo_usuario");
 
-                        helper.setBoolean("login", true);
-                        helper.setString("id", id);
-                        helper.setString("nome", nome);
-                        helper.setString("email", email);
-                        helper.setString("privilegio", tipoUsuario);
+                            helper.setBoolean("login", true);
+                            helper.setString("id", id);
+                            helper.setString("nome", nome);
+                            helper.setString("email", email);
+                            helper.setString("privilegio", tipoUsuario);
 
-                        Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(i);
-                    }else{
-                        String error = jo.getString("error");
-                        Toast.makeText(LoginActivity.this, error, Toast.LENGTH_SHORT).show();
+                            Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(i);
+                        } else {
+                            String error = jo.getString("error");
+                            Toast.makeText(LoginActivity.this, error, Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                }catch(JSONException e){
-                    e.printStackTrace();
                 }
-            }
-        }, LoginActivity.this, params);
-        RequestQueue rq = VolleySingleton.getInstance(LoginActivity.this).getRequestQueue();
-        rq.add(sr);
+            }, LoginActivity.this, params);
+            RequestQueue rq = VolleySingleton.getInstance(LoginActivity.this).getRequestQueue();
+            rq.add(sr);
+        }else{
+            Toast.makeText(this, getResources().getString(R.string.semConexaoComAInternet), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void googleSignIn(){
-        Intent signInIntent = client.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        if(checkInternet()) {
+            Intent signInIntent = client.getSignInIntent();
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        }else{
+            Toast.makeText(this, getResources().getString(R.string.semConexaoComAInternet), Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void cadastro(View v){

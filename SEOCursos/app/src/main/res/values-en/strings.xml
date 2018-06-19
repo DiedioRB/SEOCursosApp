@@ -148,7 +148,8 @@
     <string name="selecioneUmaParcialPrimeiro">Select a partial first!</string>
     <string name="valorDeNotaInvalido">Grade value is invalid!</string>
     <string name="mensagemRecuperacaoSenha">A message was sent to your e-mail! You have a week for recovery!</string>
-    <string name="aguarde">Wait...</string>
+    <string name="aguarde">Wait&#8230;</string>
     <string name="excluidoComSucesso">Deleted successfully!</string>
     <string name="falhaExclusao">Failed to delete!</string>
+    <string name="semConexaoComAInternet">No internet connection!</string>
 </resources>

@@ -193,7 +193,8 @@
     <string name="selecioneUmaParcialPrimeiro">Selecione uma parcial primeiro!</string>
     <string name="valorDeNotaInvalido">Valor de nota inválido!</string>
 
-    <string name="aguarde">Aguarde...</string>
+    <string name="aguarde">Aguarde&#8230;</string>
+    <string name="semConexaoComAInternet">Sem conexão com a internet!</string>
 
     <string name="mensagemRecuperacaoSenha">
         Uma mensagem foi enviada ao seu e-mail!

@@ -93,13 +93,12 @@ public class EditDisciplinaActivity extends AppCompatActivity {
         cursos.setAdapter(adapterCursos);
         tutores.setAdapter(adapterTutores);
 
-        tutores.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                cursos.setSelection(spinnerSelectCurso);
-                tutores.setSelection(spinnerSelectTutor);
-            }
-        }, 900);
+    //    tutores.postDelayed(new Runnable() {
+    //        @Override
+    //        public void run() {
+//
+    //        }
+    //    }, 900);
 
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -267,30 +266,45 @@ public class EditDisciplinaActivity extends AppCompatActivity {
                     }
                 }, getApplicationContext());
                 rq.add(sr);
-
-                Map<String,String> params = new HashMap<>();
-                params.put("getTutores", "getTutores");
-                sr = CRUD.customRequest(JSON_URL, new Response.Listener<String>() {
+                rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
                     @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jo = new JSONObject(response);
-                            JSONArray ja = jo.getJSONArray("tutores");
-                            for(int i=0;i<ja.length();i++){
-                                JSONObject objeto = ja.getJSONObject(i);
-                                listaTutores.add(objeto.getString("idUsuario"));
-                                adapterTutores.add(objeto.getString("nome"));
+                    public void onRequestFinished(Request<Object> request) {
+                        rq.removeRequestFinishedListener(this);
 
-                                if(idTutor.equals(objeto.getString("idUsuario"))){
-                                    spinnerSelectTutor = adapterTutores.getPosition(objeto.getString("nome"));
+                        Map<String,String> params = new HashMap<>();
+                        params.put("getTutores", "getTutores");
+                        StringRequest sr = CRUD.customRequest(JSON_URL, new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                try {
+                                    JSONObject jo = new JSONObject(response);
+                                    JSONArray ja = jo.getJSONArray("tutores");
+                                    for(int i=0;i<ja.length();i++){
+                                        JSONObject objeto = ja.getJSONObject(i);
+                                        listaTutores.add(objeto.getString("idUsuario"));
+                                        adapterTutores.add(objeto.getString("nome"));
+
+                                        if(idTutor.equals(objeto.getString("idUsuario"))){
+                                            spinnerSelectTutor = adapterTutores.getPosition(objeto.getString("nome"));
+                                        }
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        }, EditDisciplinaActivity.this, params);
+                        rq.add(sr);
+
+                        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                            @Override
+                            public void onRequestFinished(Request<Object> request) {
+                                rq.removeRequestFinishedListener(this);
+                                cursos.setSelection(spinnerSelectCurso);
+                                tutores.setSelection(spinnerSelectTutor);
+                            }
+                        });
                     }
-                }, EditDisciplinaActivity.this, params);
-                rq.add(sr);
+                });
             }
         });
     }

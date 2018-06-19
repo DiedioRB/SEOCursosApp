@@ -1,8 +1,13 @@
 package br.com.seocursos.seocursos;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -23,6 +28,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import br.com.seocursos.seocursos.Fragments.AdministradorMenu;
 import br.com.seocursos.seocursos.Fragments.AlunoMenu;
 import br.com.seocursos.seocursos.Fragments.TutorMenu;
+import br.com.seocursos.seocursos.Outros.ProgressDialogHelper;
 
 public class MainActivity extends AppCompatActivity {
     private String nome;
@@ -30,6 +36,12 @@ public class MainActivity extends AppCompatActivity {
     TextView userName;
     LinearLayout container;
     SharedPreferencesHelper helper;
+
+    Snackbar snackbar;
+
+    ProgressDialogHelper pd;
+
+    ConnectivityManager connectivityManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +51,14 @@ public class MainActivity extends AppCompatActivity {
 
         userName = findViewById(R.id.userName);
         container = findViewById(R.id.container);
+
+        pd = new ProgressDialogHelper(MainActivity.this);
+        connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        snackbar = Snackbar.make(container, getResources().getString(R.string.semConexaoComAInternet), Snackbar.LENGTH_SHORT);
+        if(!checkInternet()) {
+            snackbar.show();
+        }
 
         helper = new SharedPreferencesHelper(MainActivity.this);
         if (!helper.getBoolean("login")) {
@@ -102,6 +122,23 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    public boolean checkInternet(){
+        pd.open();
+        boolean is3G = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnectedOrConnecting();
+        boolean isWifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting();
+
+        boolean retorno;
+
+        if(!(is3G || isWifi)){
+            retorno = false;
+        }else{
+            retorno = true;
+        }
+        pd.close();
+        return retorno;
+    }
+
     public void usuarios(View v){
         goTo(UsuariosActivity.class);
     }
@@ -134,8 +171,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void goTo(Class classe){
-        Intent i = new Intent(MainActivity.this, classe);
-        startActivity(i);
+        if(checkInternet()) {
+            Intent i = new Intent(MainActivity.this, classe);
+            startActivity(i);
+        }else{
+            if(!snackbar.isShown()) {
+                snackbar.show();
+            }
+        }
     }
 
     public void sair(){
@@ -152,7 +195,9 @@ public class MainActivity extends AppCompatActivity {
         GoogleSignInClient client = GoogleSignIn.getClient(this, gso);
         client.signOut();
 
-        goTo(LoginActivity.class);
+        Intent i = new Intent(MainActivity.this, LoginActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
     }
 
     @Override
