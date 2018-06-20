@@ -73,73 +73,77 @@ public class AddDisciplinaActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pd.open();
-                Map<String,String> params = new HashMap<String,String>();
-                params.put("nome", nome.getText().toString());
-                params.put("cargaHoraria", cargaHoraria.getText().toString());
-                params.put("duracao", duracao.getText().toString());
-                params.put("area", area.getText().toString());
+                if(validarCampos()) {
+                    pd.open();
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("nome", nome.getText().toString());
+                    params.put("cargaHoraria", cargaHoraria.getText().toString());
+                    params.put("duracao", duracao.getText().toString());
+                    params.put("area", area.getText().toString());
 
-                String nivelDisciplina,modalidadeDisciplina;
-                switch(nivel.getCheckedRadioButtonId()){
-                    case R.id.gratis:
-                        nivelDisciplina = "F";
-                        break;
-                    case R.id.tecnico:
-                        nivelDisciplina = "T";
-                        break;
-                    case R.id.graduacao:
-                        nivelDisciplina = "G";
-                        break;
-                    case R.id.posGraduacao:
-                        nivelDisciplina = "P";
-                        break;
-                    default:
-                        nivelDisciplina = null;
-                        break;
-                }
-                if(modalidade.getCheckedRadioButtonId() == R.id.semiPresencial){
-                    modalidadeDisciplina = "1";
-                }else{
-                    modalidadeDisciplina = "2";
-                }
-                params.put("nivel", nivelDisciplina);
-                params.put("modalidade", modalidadeDisciplina);
+                    String nivelDisciplina, modalidadeDisciplina;
+                    switch (nivel.getCheckedRadioButtonId()) {
+                        case R.id.gratis:
+                            nivelDisciplina = "F";
+                            break;
+                        case R.id.tecnico:
+                            nivelDisciplina = "T";
+                            break;
+                        case R.id.graduacao:
+                            nivelDisciplina = "G";
+                            break;
+                        case R.id.posGraduacao:
+                            nivelDisciplina = "P";
+                            break;
+                        default:
+                            nivelDisciplina = null;
+                            break;
+                    }
+                    if (modalidade.getCheckedRadioButtonId() == R.id.semiPresencial) {
+                        modalidadeDisciplina = "1";
+                    } else {
+                        modalidadeDisciplina = "2";
+                    }
+                    params.put("nivel", nivelDisciplina);
+                    params.put("modalidade", modalidadeDisciplina);
 
-                Curso curso = listaCursos.get(cursos.getSelectedItemPosition());
-                id = curso.getId();
-                params.put("id_curso", id);
+                    Curso curso = listaCursos.get(cursos.getSelectedItemPosition());
+                    id = curso.getId();
+                    params.put("id_curso", id);
 
-                String idTutor = listaTutores.get(tutores.getSelectedItemPosition());
-                params.put("idTutor", idTutor);
+                    String idTutor = listaTutores.get(tutores.getSelectedItemPosition());
+                    params.put("idTutor", idTutor);
 
-                StringRequest sr = CRUD.inserir(JSON_URL, new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jo = new JSONObject(response);
-                            boolean enviado = jo.getBoolean("resposta");
-                            if(enviado) {
-                                Toast.makeText(AddDisciplinaActivity.this, getResources().getString(R.string.cadastradoComSucesso), Toast.LENGTH_SHORT).show();
-                            }else{
-                                Toast.makeText(AddDisciplinaActivity.this, getResources().getString(R.string.falhaCadastro), Toast.LENGTH_SHORT).show();
+                    StringRequest sr = CRUD.inserir(JSON_URL, new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                JSONObject jo = new JSONObject(response);
+                                boolean enviado = jo.getBoolean("resposta");
+                                if (enviado) {
+                                    Toast.makeText(AddDisciplinaActivity.this, getResources().getString(R.string.cadastradoComSucesso), Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(AddDisciplinaActivity.this, getResources().getString(R.string.falhaCadastro), Toast.LENGTH_SHORT).show();
+                                }
+                                Intent i = new Intent(AddDisciplinaActivity.this, DisciplinasActivity.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(i);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                            Intent i = new Intent(AddDisciplinaActivity.this, DisciplinasActivity.class);
-                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(i);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                    }
-                },params,AddDisciplinaActivity.this);
-                RequestQueue rq = VolleySingleton.getInstance(AddDisciplinaActivity.this).getRequestQueue();
-                rq.add(sr);
-                rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
-                    @Override
-                    public void onRequestFinished(Request<Object> request) {
-                        pd.close();
-                    }
-                });
+                    }, params, AddDisciplinaActivity.this);
+                    RequestQueue rq = VolleySingleton.getInstance(AddDisciplinaActivity.this).getRequestQueue();
+                    rq.add(sr);
+                    rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                        @Override
+                        public void onRequestFinished(Request<Object> request) {
+                            pd.close();
+                        }
+                    });
+                }else{
+                    Toast.makeText(AddDisciplinaActivity.this, getResources().getString(R.string.preenchaOsCamposPrimeiro), Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -198,5 +202,9 @@ public class AddDisciplinaActivity extends AppCompatActivity {
         }, AddDisciplinaActivity.this, params);
 
         rq.add(sr);
+    }
+    public boolean validarCampos(){
+        return !(nome.getText().toString().isEmpty() || cargaHoraria.getText().toString().isEmpty() ||
+                duracao.getText().toString().isEmpty() || area.getText().toString().isEmpty());
     }
 }

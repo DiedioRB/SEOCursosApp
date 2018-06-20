@@ -57,44 +57,48 @@ public class AddTarefaActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pd.open();
-                Map<String,String> params = new HashMap<String, String>();
-                params.put("descricao", descricao.getText().toString());
+                if(validarCampos()) {
+                    pd.open();
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("descricao", descricao.getText().toString());
 
-                Disciplina disciplina = listaDisciplinas.get(spinner.getSelectedItemPosition());
-                idDisciplina = disciplina.getId();
-                params.put("id_disciplina", idDisciplina);
-                SharedPreferencesHelper preferences = new SharedPreferencesHelper(AddTarefaActivity.this);
-                String idUsuario = preferences.getString("id");
-                params.put("id_usuario", idUsuario);
+                    Disciplina disciplina = listaDisciplinas.get(spinner.getSelectedItemPosition());
+                    idDisciplina = disciplina.getId();
+                    params.put("id_disciplina", idDisciplina);
+                    SharedPreferencesHelper preferences = new SharedPreferencesHelper(AddTarefaActivity.this);
+                    String idUsuario = preferences.getString("id");
+                    params.put("id_usuario", idUsuario);
 
-                StringRequest sr = CRUD.inserir(JSON_URL, new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jo = new JSONObject(response);
-                            boolean enviado = jo.getBoolean("resposta");
-                            if(enviado) {
-                                Toast.makeText(AddTarefaActivity.this, getResources().getString(R.string.cadastradoComSucesso), Toast.LENGTH_SHORT).show();
-                            }else{
-                                Toast.makeText(AddTarefaActivity.this, getResources().getString(R.string.falhaCadastro), Toast.LENGTH_SHORT).show();
+                    StringRequest sr = CRUD.inserir(JSON_URL, new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                JSONObject jo = new JSONObject(response);
+                                boolean enviado = jo.getBoolean("resposta");
+                                if (enviado) {
+                                    Toast.makeText(AddTarefaActivity.this, getResources().getString(R.string.cadastradoComSucesso), Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(AddTarefaActivity.this, getResources().getString(R.string.falhaCadastro), Toast.LENGTH_SHORT).show();
+                                }
+                                Intent i = new Intent(AddTarefaActivity.this, TarefasActivity.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(i);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                            Intent i = new Intent(AddTarefaActivity.this, TarefasActivity.class);
-                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(i);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                    }
-                },params,AddTarefaActivity.this);
-                RequestQueue rq = VolleySingleton.getInstance(AddTarefaActivity.this).getRequestQueue();
-                rq.add(sr);
-                rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
-                    @Override
-                    public void onRequestFinished(Request<Object> request) {
-                        pd.close();
-                    }
-                });
+                    }, params, AddTarefaActivity.this);
+                    RequestQueue rq = VolleySingleton.getInstance(AddTarefaActivity.this).getRequestQueue();
+                    rq.add(sr);
+                    rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                        @Override
+                        public void onRequestFinished(Request<Object> request) {
+                            pd.close();
+                        }
+                    });
+                }else{
+                    Toast.makeText(AddTarefaActivity.this, getResources().getString(R.string.preenchaOsCamposPrimeiro), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -103,7 +107,6 @@ public class AddTarefaActivity extends AppCompatActivity {
         spinner.setAdapter(adapter);
     }
     public void carregar(){
-
         String cursosURL = "https://www.seocursos.com.br/PHP/Android/disciplinas.php";
         StringRequest sr = CRUD.selecionar(cursosURL, new Response.Listener<String>() {
             @Override
@@ -132,5 +135,8 @@ public class AddTarefaActivity extends AppCompatActivity {
                 pd.close();
             }
         });
+    }
+    public boolean validarCampos(){
+        return !(descricao.getText().toString().isEmpty());
     }
 }

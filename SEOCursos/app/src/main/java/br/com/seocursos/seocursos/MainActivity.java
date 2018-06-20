@@ -2,14 +2,15 @@ package br.com.seocursos.seocursos;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.Uri;
-import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,6 +25,8 @@ import com.flurry.android.FlurryAgent;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+
+import java.util.Locale;
 
 import br.com.seocursos.seocursos.Fragments.AdministradorMenu;
 import br.com.seocursos.seocursos.Fragments.AlunoMenu;
@@ -46,6 +49,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        helper = new SharedPreferencesHelper(MainActivity.this);
+        if(helper.getString("linguagem") != null) {
+            changeLanguage(helper.getString("linguagem"));
+        }else{
+            helper.setString("linguagem", "pt");
+            changeLanguage(helper.getString("linguagem"));
+        }
+
         setContentView(R.layout.activity_main);
         new FlurryAgent.Builder().withLogEnabled(false).build(this, "62X37KYC3XJ5XPQF2RP2");
 
@@ -60,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
             snackbar.show();
         }
 
-        helper = new SharedPreferencesHelper(MainActivity.this);
         if (!helper.getBoolean("login")) {
             Intent i = new Intent(MainActivity.this, LoginActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -105,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
+
         return true;
     }
     @Override
@@ -114,6 +126,24 @@ public class MainActivity extends AppCompatActivity {
             case R.id.minhaConta:
                 Intent i = new Intent(MainActivity.this, MinhaContaActivity.class);
                 startActivity(i);
+                return true;
+            case R.id.portugues:
+                helper.setString("linguagem", "pt");
+                changeLanguage(helper.getString("linguagem"));
+                finish();
+                startActivity(getIntent());
+                return true;
+            case R.id.ingles:
+                helper.setString("linguagem", "en");
+                changeLanguage(helper.getString("linguagem"));
+                finish();
+                startActivity(getIntent());
+                return true;
+            case R.id.espanhol:
+                helper.setString("linguagem", "es");
+                changeLanguage(helper.getString("linguagem"));
+                finish();
+                startActivity(getIntent());
                 return true;
             case R.id.sair:
                 sair();
@@ -180,7 +210,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
     public void sair(){
         helper.setBoolean("login", false);
         helper.setString("id", null);
@@ -200,8 +229,15 @@ public class MainActivity extends AppCompatActivity {
         startActivity(i);
     }
 
-    @Override
-    public void onBackPressed(){
-        super.onBackPressed();
+    public void changeLanguage(String codigo){
+        Resources res = getResources(); // os recursos
+        DisplayMetrics dm = res.getDisplayMetrics();
+        android.content.res.Configuration conf = res.getConfiguration(); // configuração dos recursos
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) { // verifica a versao do android com o sdk
+            conf.setLocale(new Locale(codigo.toLowerCase()));
+        }else {
+            conf.locale = new Locale(codigo.toLowerCase());
+        }
+        res.updateConfiguration(conf, dm);
     }
 }

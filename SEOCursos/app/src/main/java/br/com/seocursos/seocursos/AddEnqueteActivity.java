@@ -49,44 +49,53 @@ public class AddEnqueteActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pd.open();
-                Map<String,String> params = new HashMap<String,String>();
+                if(validarCampos()) {
+                    pd.open();
+                    Map<String, String> params = new HashMap<String, String>();
 
-                params.put("questao", pergunta.getText().toString());
-                params.put("valorA", respostaA.getText().toString());
-                params.put("valorB", respostaB.getText().toString());
-                params.put("valorC", respostaC.getText().toString());
-                params.put("valorD", respostaD.getText().toString());
-                params.put("valorE", respostaE.getText().toString());
+                    params.put("questao", pergunta.getText().toString());
+                    params.put("valorA", respostaA.getText().toString());
+                    params.put("valorB", respostaB.getText().toString());
+                    params.put("valorC", respostaC.getText().toString());
+                    params.put("valorD", respostaD.getText().toString());
+                    params.put("valorE", respostaE.getText().toString());
 
-                StringRequest sr = CRUD.inserir(JSON_URL, new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jo = new JSONObject(response);
-                            boolean enviado = jo.getBoolean("resposta");
-                            if(enviado) {
-                                Toast.makeText(AddEnqueteActivity.this, getResources().getString(R.string.cadastradoComSucesso), Toast.LENGTH_SHORT).show();
-                            }else{
-                                Toast.makeText(AddEnqueteActivity.this, getResources().getString(R.string.falhaCadastro), Toast.LENGTH_SHORT).show();
+                    StringRequest sr = CRUD.inserir(JSON_URL, new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                JSONObject jo = new JSONObject(response);
+                                boolean enviado = jo.getBoolean("resposta");
+                                if (enviado) {
+                                    Toast.makeText(AddEnqueteActivity.this, getResources().getString(R.string.cadastradoComSucesso), Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(AddEnqueteActivity.this, getResources().getString(R.string.falhaCadastro), Toast.LENGTH_SHORT).show();
+                                }
+                                Intent i = new Intent(AddEnqueteActivity.this, EnquetesActivity.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(i);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                            Intent i = new Intent(AddEnqueteActivity.this, EnquetesActivity.class);
-                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(i);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                    }
-                },params,AddEnqueteActivity.this);
-                RequestQueue rq = VolleySingleton.getInstance(AddEnqueteActivity.this).getRequestQueue();
-                rq.add(sr);
-                rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
-                    @Override
-                    public void onRequestFinished(Request<Object> request) {
-                        pd.close();
-                    }
-                });
+                    }, params, AddEnqueteActivity.this);
+                    RequestQueue rq = VolleySingleton.getInstance(AddEnqueteActivity.this).getRequestQueue();
+                    rq.add(sr);
+                    rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                        @Override
+                        public void onRequestFinished(Request<Object> request) {
+                            pd.close();
+                        }
+                    });
+                }else{
+                    Toast.makeText(AddEnqueteActivity.this, getResources().getString(R.string.preenchaOsCamposPrimeiro), Toast.LENGTH_SHORT).show();
+                }
             }
         });
+    }
+    public boolean validarCampos(){
+        return !(pergunta.getText().toString().isEmpty() || respostaA.getText().toString().isEmpty() ||
+                respostaB.getText().toString().isEmpty() || respostaC.getText().toString().isEmpty() ||
+                respostaD.getText().toString().isEmpty() || respostaE.getText().toString().isEmpty());
     }
 }

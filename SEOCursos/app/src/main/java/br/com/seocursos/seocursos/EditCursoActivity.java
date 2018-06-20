@@ -128,117 +128,121 @@ public class EditCursoActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pd.open();
-                Map<String,String> params = new HashMap<String,String>();
-                params.put("idCurso",id);
+                if(validarCampos()) {
+                    pd.open();
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("idCurso", id);
 
-                params.put("nome", nome.getText().toString());
-                params.put("area", area.getText().toString());
-                params.put("cargaHoraria", cargaHoraria.getText().toString());
-                params.put("preRequisitos", preRequisitos.getText().toString());
-                params.put("descricao", descricao.getText().toString());
-                params.put("preco", preco.getText().toString());
+                    params.put("nome", nome.getText().toString());
+                    params.put("area", area.getText().toString());
+                    params.put("cargaHoraria", cargaHoraria.getText().toString());
+                    params.put("preRequisitos", preRequisitos.getText().toString());
+                    params.put("descricao", descricao.getText().toString());
+                    params.put("preco", preco.getText().toString());
 
-                String tipoCurso, modalidade;
-                RadioGroup modalidadeGroup;
-                switch(tipo.getCheckedRadioButtonId()){
-                    case R.id.gratis:
-                        tipoCurso = "F";
+                    String tipoCurso, modalidade;
+                    RadioGroup modalidadeGroup;
+                    switch (tipo.getCheckedRadioButtonId()) {
+                        case R.id.gratis:
+                            tipoCurso = "F";
 
-                        params.put("tempoDisponivel", ((TextInputEditText)findViewById(R.id.disponivel)).getText().toString());
-                        params.put("nivel", ((TextInputEditText)findViewById(R.id.nivel)).getText().toString());
-                        break;
-                    case R.id.tecnico:
-                        tipoCurso = "T";
+                            params.put("tempoDisponivel", ((TextInputEditText) findViewById(R.id.disponivel)).getText().toString());
+                            params.put("nivel", ((TextInputEditText) findViewById(R.id.nivel)).getText().toString());
+                            break;
+                        case R.id.tecnico:
+                            tipoCurso = "T";
 
-                        modalidadeGroup = findViewById(R.id.modalidadeT);
-                        if(modalidadeGroup.getCheckedRadioButtonId() == R.id.semipresencialT){
-                            modalidade = "1";
-                        }else{
-                            modalidade = "2";
-                        }
-
-                        params.put("modalidade", modalidade);
-                        params.put("duracao", ((TextInputEditText)findViewById(R.id.duracaoT)).getText().toString());
-                        break;
-                    case R.id.graduacao:
-                        tipoCurso = "G";
-
-                        modalidadeGroup = findViewById(R.id.modalidadeG);
-                        if(modalidadeGroup.getCheckedRadioButtonId() == R.id.semipresencialG){
-                            modalidade = "1";
-                        }else{
-                            modalidade = "2";
-                        }
-                        String titulacao;
-                        RadioGroup titulacaoGroup = findViewById(R.id.titulacao);
-                        if(titulacaoGroup.getCheckedRadioButtonId() == R.id.licenciado){
-                            titulacao = "L";
-                        }else{
-                            titulacao = "B";
-                        }
-
-                        params.put("modalidade", modalidade);
-                        params.put("titulacao", titulacao);
-                        params.put("duracao", ((TextInputEditText)findViewById(R.id.duracaoG)).getText().toString());
-                        params.put("notaMec", ((TextInputEditText)findViewById(R.id.notaMecG)).getText().toString());
-                        break;
-                    case R.id.posGraduacao:
-                        tipoCurso = "P";
-
-                        modalidadeGroup = findViewById(R.id.modalidadeP);
-                        if(modalidadeGroup.getCheckedRadioButtonId() == R.id.semipresencialP){
-                            modalidade = "1";
-                        }else{
-                            modalidade = "2";
-                        }
-                        String status;
-                        RadioGroup statusGroup = findViewById(R.id.titulacao);
-                        if(statusGroup.getCheckedRadioButtonId() == R.id.licenciado){
-                            status = "L";
-                        }else{
-                            status = "B";
-                        }
-
-                        params.put("modalidade", modalidade);
-                        params.put("status", status);
-                        params.put("duracao", ((TextInputEditText)findViewById(R.id.duracaoP)).getText().toString());
-                        params.put("notaMec", ((TextInputEditText)findViewById(R.id.notaMecP)).getText().toString());
-                        break;
-                    default:
-                        tipoCurso = "";
-                        break;
-                }
-                params.put("tipo", tipoCurso);
-
-                StringRequest sr = CRUD.editar(JSON_URL, new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Toast.makeText(EditCursoActivity.this, response, Toast.LENGTH_SHORT).show();
-                        try {
-                            JSONObject jo = new JSONObject(response);
-                            boolean enviado = jo.getBoolean("resposta");
-                            if(enviado) {
-                                Toast.makeText(EditCursoActivity.this, getResources().getString(R.string.editadoComSucesso), Toast.LENGTH_SHORT).show();
-                            }else{
-                                Toast.makeText(EditCursoActivity.this, getResources().getString(R.string.falhaEdicao), Toast.LENGTH_SHORT).show();
+                            modalidadeGroup = findViewById(R.id.modalidadeT);
+                            if (modalidadeGroup.getCheckedRadioButtonId() == R.id.semipresencialT) {
+                                modalidade = "1";
+                            } else {
+                                modalidade = "2";
                             }
-                            Intent i = new Intent(EditCursoActivity.this, CursosActivity.class);
-                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(i);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+
+                            params.put("modalidade", modalidade);
+                            params.put("duracao", ((TextInputEditText) findViewById(R.id.duracaoT)).getText().toString());
+                            break;
+                        case R.id.graduacao:
+                            tipoCurso = "G";
+
+                            modalidadeGroup = findViewById(R.id.modalidadeG);
+                            if (modalidadeGroup.getCheckedRadioButtonId() == R.id.semipresencialG) {
+                                modalidade = "1";
+                            } else {
+                                modalidade = "2";
+                            }
+                            String titulacao;
+                            RadioGroup titulacaoGroup = findViewById(R.id.titulacao);
+                            if (titulacaoGroup.getCheckedRadioButtonId() == R.id.licenciado) {
+                                titulacao = "L";
+                            } else {
+                                titulacao = "B";
+                            }
+
+                            params.put("modalidade", modalidade);
+                            params.put("titulacao", titulacao);
+                            params.put("duracao", ((TextInputEditText) findViewById(R.id.duracaoG)).getText().toString());
+                            params.put("notaMec", ((TextInputEditText) findViewById(R.id.notaMecG)).getText().toString());
+                            break;
+                        case R.id.posGraduacao:
+                            tipoCurso = "P";
+
+                            modalidadeGroup = findViewById(R.id.modalidadeP);
+                            if (modalidadeGroup.getCheckedRadioButtonId() == R.id.semipresencialP) {
+                                modalidade = "1";
+                            } else {
+                                modalidade = "2";
+                            }
+                            String status;
+                            RadioGroup statusGroup = findViewById(R.id.titulacao);
+                            if (statusGroup.getCheckedRadioButtonId() == R.id.licenciado) {
+                                status = "L";
+                            } else {
+                                status = "B";
+                            }
+
+                            params.put("modalidade", modalidade);
+                            params.put("status", status);
+                            params.put("duracao", ((TextInputEditText) findViewById(R.id.duracaoP)).getText().toString());
+                            params.put("notaMec", ((TextInputEditText) findViewById(R.id.notaMecP)).getText().toString());
+                            break;
+                        default:
+                            tipoCurso = "";
+                            break;
+                    }
+                    params.put("tipo", tipoCurso);
+
+                    StringRequest sr = CRUD.editar(JSON_URL, new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Toast.makeText(EditCursoActivity.this, response, Toast.LENGTH_SHORT).show();
+                            try {
+                                JSONObject jo = new JSONObject(response);
+                                boolean enviado = jo.getBoolean("resposta");
+                                if (enviado) {
+                                    Toast.makeText(EditCursoActivity.this, getResources().getString(R.string.editadoComSucesso), Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(EditCursoActivity.this, getResources().getString(R.string.falhaEdicao), Toast.LENGTH_SHORT).show();
+                                }
+                                Intent i = new Intent(EditCursoActivity.this, CursosActivity.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(i);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
-                },params, EditCursoActivity.this);
-                RequestQueue rq = VolleySingleton.getInstance(EditCursoActivity.this).getRequestQueue();
-                rq.add(sr);
-                rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
-                    @Override
-                    public void onRequestFinished(Request<Object> request) {
-                        pd.close();
-                    }
-                });
+                    }, params, EditCursoActivity.this);
+                    RequestQueue rq = VolleySingleton.getInstance(EditCursoActivity.this).getRequestQueue();
+                    rq.add(sr);
+                    rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                        @Override
+                        public void onRequestFinished(Request<Object> request) {
+                            pd.close();
+                        }
+                    });
+                }else{
+                    Toast.makeText(EditCursoActivity.this, getResources().getString(R.string.preenchaOsCamposPrimeiro), Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -356,5 +360,38 @@ public class EditCursoActivity extends AppCompatActivity {
                 pd.close();
             }
         });
+    }
+    public boolean validarCampos(){
+        if(!(nome.getText().toString().isEmpty() || area.getText().toString().isEmpty() ||
+                cargaHoraria.getText().toString().isEmpty() || preRequisitos.getText().toString().isEmpty() ||
+                descricao.getText().toString().isEmpty() || preco.getText().toString().isEmpty() ||
+                dataDisponivel.getText().toString().isEmpty())){
+            boolean isValid = false;
+            switch(tipo.getCheckedRadioButtonId()){
+                case R.id.gratis:
+                    if(!(dataDisponivel.getText().toString().isEmpty() || nivel.getText().toString().isEmpty())){
+                        isValid = true;
+                    }
+                    break;
+                case R.id.tecnico:
+                    if(!(duracaoT.getText().toString().isEmpty())){
+                        isValid = true;
+                    }
+                    break;
+                case R.id.graduacao:
+                    if(!(duracaoG.getText().toString().isEmpty() || notaMecG.getText().toString().isEmpty())){
+                        isValid = true;
+                    }
+                    break;
+                case R.id.posGraduacao:
+                    if(!(duracaoP.getText().toString().isEmpty() || notaMecP.getText().toString().isEmpty())){
+                        isValid = true;
+                    }
+                    break;
+            }
+            return isValid;
+        }else{
+            return false;
+        }
     }
 }

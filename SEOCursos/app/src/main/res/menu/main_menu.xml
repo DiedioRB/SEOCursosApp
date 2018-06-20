@@ -2,6 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/minhaConta"
         android:title="@string/minhaConta" />
+    <item android:id="@+id/linguagem"
+        android:title="@string/linguagem"
+        android:icon="@drawable/ic_translate">
+        <menu>
+            <item android:id="@+id/portugues"
+                android:title="@string/portugues"/>
+            <item android:id="@+id/ingles"
+                android:title="@string/ingles"/>
+            <item android:id="@+id/espanhol"
+                android:title="@string/espanhol"/>
+        </menu>
+    </item>
     <item android:id="@+id/sair"
         android:title="@string/sair" />
 </menu>

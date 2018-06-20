@@ -129,96 +129,100 @@ public class AddUsuarioActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pd.open();
-                Map<String, String> params = new HashMap<String, String>();
+                if(validarCampos()) {
+                    pd.open();
+                    Map<String, String> params = new HashMap<String, String>();
 
-                params.put("nome", nome.getText().toString());
-                params.put("senha", senha.getText().toString());
-                params.put("email", email.getText().toString());
-                params.put("cpf", cpf.getText().toString());
-                params.put("cep", cep.getText().toString());
-                params.put("endereco", endereco.getText().toString());
-                params.put("numero", numero.getText().toString());
-                params.put("cidade", cidade.getText().toString());
-                params.put("estado", estado.getText().toString());
+                    params.put("nome", nome.getText().toString());
+                    params.put("senha", senha.getText().toString());
+                    params.put("email", email.getText().toString());
+                    params.put("cpf", cpf.getText().toString());
+                    params.put("cep", cep.getText().toString());
+                    params.put("endereco", endereco.getText().toString());
+                    params.put("numero", numero.getText().toString());
+                    params.put("cidade", cidade.getText().toString());
+                    params.put("estado", estado.getText().toString());
 
-                switch(privilegio){
-                    case "A":
-                        params.put("tipoUsuario", "A");
+                    switch (privilegio) {
+                        case "A":
+                            params.put("tipoUsuario", "A");
 
-                        params.put("telUsuario", telUsuario.getText().toString());
-                        break;
-                    case "T":
-                        params.put("tipoUsuario", "T");
-                        params.put("telCel", telCel.getText().toString());
-                        params.put("telRes", telRes.getText().toString());
+                            params.put("telUsuario", telUsuario.getText().toString());
+                            break;
+                        case "T":
+                            params.put("tipoUsuario", "T");
+                            params.put("telCel", telCel.getText().toString());
+                            params.put("telRes", telRes.getText().toString());
 
-                        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
-                        ParsePosition pos = new ParsePosition(0);
-                        Date data = formato.parse(dataNascimento.getText().toString(),pos);
-                        formato = new SimpleDateFormat("yyyy-MM-dd");
-                        String date = formato.format(data);
+                            SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+                            ParsePosition pos = new ParsePosition(0);
+                            Date data = formato.parse(dataNascimento.getText().toString(), pos);
+                            formato = new SimpleDateFormat("yyyy-MM-dd");
+                            String date = formato.format(data);
 
-                        params.put("dataNascimento", date);
-                        params.put("curso", curso.getText().toString());
-                        params.put("instituicao", instituicao.getText().toString());
-                        params.put("anoConclusao", anoConclusao.getText().toString());
-                        break;
-                    case "D":
-                        params.put("tipoUsuario", "D");
-                        break;
-                }
+                            params.put("dataNascimento", date);
+                            params.put("curso", curso.getText().toString());
+                            params.put("instituicao", instituicao.getText().toString());
+                            params.put("anoConclusao", anoConclusao.getText().toString());
+                            break;
+                        case "D":
+                            params.put("tipoUsuario", "D");
+                            break;
+                    }
 
-                String sexoS;
-                if(sexo.getCheckedRadioButtonId() == R.id.masculinoUsuario){
-                    sexoS = "M";
-                }else{
-                    sexoS = "F";
-                }
+                    String sexoS;
+                    if (sexo.getCheckedRadioButtonId() == R.id.masculinoUsuario) {
+                        sexoS = "M";
+                    } else {
+                        sexoS = "F";
+                    }
 
-                params.put("sexo", sexoS);
+                    params.put("sexo", sexoS);
 
-                //Imagens
-                if(imagem != null) {
-                    String imagemUsuario = getStringImage(imagem);
-                    params.put("foto", imagemUsuario);
-                }
+                    //Imagens
+                    if (imagem != null) {
+                        String imagemUsuario = getStringImage(imagem);
+                        params.put("foto", imagemUsuario);
+                    }
 
-                StringRequest sr = CRUD.inserir(JSON_URL, new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Toast.makeText(AddUsuarioActivity.this, response, Toast.LENGTH_SHORT).show();
-                        try {
-                            JSONObject jo = new JSONObject(response);
-                            boolean enviado = jo.getBoolean("resposta");
+                    StringRequest sr = CRUD.inserir(JSON_URL, new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Toast.makeText(AddUsuarioActivity.this, response, Toast.LENGTH_SHORT).show();
+                            try {
+                                JSONObject jo = new JSONObject(response);
+                                boolean enviado = jo.getBoolean("resposta");
 
-                            if(enviado) {
-                                Toast.makeText(AddUsuarioActivity.this, getResources().getString(R.string.cadastradoComSucesso), Toast.LENGTH_SHORT).show();
-                            }else{
-                                Toast.makeText(AddUsuarioActivity.this, getResources().getString(R.string.falhaCadastro), Toast.LENGTH_SHORT).show();
+                                if (enviado) {
+                                    Toast.makeText(AddUsuarioActivity.this, getResources().getString(R.string.cadastradoComSucesso), Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(AddUsuarioActivity.this, getResources().getString(R.string.falhaCadastro), Toast.LENGTH_SHORT).show();
+                                }
+                                Intent i = getIntent();
+                                boolean toLogin = i.getBooleanExtra("toLogin", false);
+                                if (toLogin) {
+                                    i = new Intent(AddUsuarioActivity.this, LoginActivity.class);
+                                } else {
+                                    i = new Intent(AddUsuarioActivity.this, UsuariosActivity.class);
+                                }
+                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(i);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                            Intent i = getIntent();
-                            boolean toLogin = i.getBooleanExtra("toLogin", false);
-                            if(toLogin) {
-                                i = new Intent(AddUsuarioActivity.this, LoginActivity.class);
-                            }else {
-                                i = new Intent(AddUsuarioActivity.this, UsuariosActivity.class);
-                            }
-                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(i);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                    }
-                },params,getApplicationContext());
-                RequestQueue rq = VolleySingleton.getInstance(AddUsuarioActivity.this).getRequestQueue();
-                rq.add(sr);
-                rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
-                    @Override
-                    public void onRequestFinished(Request<Object> request) {
-                        pd.close();
-                    }
-                });
+                    }, params, getApplicationContext());
+                    RequestQueue rq = VolleySingleton.getInstance(AddUsuarioActivity.this).getRequestQueue();
+                    rq.add(sr);
+                    rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                        @Override
+                        public void onRequestFinished(Request<Object> request) {
+                            pd.close();
+                        }
+                    });
+                }else{
+                    Toast.makeText(AddUsuarioActivity.this, getResources().getString(R.string.preenchaOsCamposPrimeiro), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -324,5 +328,40 @@ public class AddUsuarioActivity extends AppCompatActivity {
         String temp = Base64.encodeToString(b, Base64.DEFAULT);
 
         return temp;
+    }
+
+    public boolean validarCampos(){
+        if(!(nome.getText().toString().isEmpty() || senha.getText().toString().isEmpty() ||
+                confSenha.getText().toString().isEmpty() || email.getText().toString().isEmpty() ||
+                cpf.getText().toString().isEmpty() || cep.getText().toString().isEmpty() ||
+                endereco.getText().toString().isEmpty() || numero.getText().toString().isEmpty() ||
+                cidade.getText().toString().isEmpty() || estado.getText().toString().isEmpty())){
+            boolean isValid = false;
+            switch(privilegio){
+                case "A":
+                    if(!(telUsuario.getText().toString().isEmpty())){
+                        isValid = true;
+                    }
+                    break;
+                case "T":
+                    if(!(telCel.getText().toString().isEmpty() || telRes.getText().toString().isEmpty() ||
+                            dataNascimento.getText().toString().isEmpty() || curso.getText().toString().isEmpty() ||
+                            instituicao.getText().toString().isEmpty() || anoConclusao.getText().toString().isEmpty())){
+                        isValid = true;
+                    }
+                    break;
+                case "D":
+                    isValid = true;
+                    break;
+            }
+            if(!(senha.getText().toString().equals(confSenha.getText().toString()))){
+                Toast.makeText(this, getResources().getString(R.string.senhasAmbiguas), Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+
+            return isValid;
+        }else{
+            return false;
+        }
     }
 }

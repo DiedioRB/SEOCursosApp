@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SEO Courses</string>
-    <string name="fazerLogin">Login</string>
     <string name="minhaConta">My Account</string>
     <string name="sair">Quit</string>
     <string name="cadastreSeAqui">Register Here!</string>
@@ -152,4 +151,9 @@
     <string name="excluidoComSucesso">Deleted successfully!</string>
     <string name="falhaExclusao">Failed to delete!</string>
     <string name="semConexaoComAInternet">No internet connection!</string>
+    <string name="linguagem">Language</string>
+    <string name="portugues">Portuguese</string>
+    <string name="ingles">English</string>
+    <string name="espanhol">Spanish</string>
+    <string name="senhasAmbiguas">Ambiguous Passwords!</string>
 </resources>

@@ -61,43 +61,47 @@ public class EditEnqueteActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pd.open();
-                Map<String,String> params = new HashMap<String,String>();
+                if(validarCampos()) {
+                    pd.open();
+                    Map<String, String> params = new HashMap<String, String>();
 
-                params.put("id_enquete", id);
-                params.put("questao", pergunta.getText().toString());
-                params.put("valorA", respostaA.getText().toString());
-                params.put("valorB", respostaB.getText().toString());
-                params.put("valorC", respostaC.getText().toString());
-                params.put("valorD", respostaD.getText().toString());
-                params.put("valorE", respostaE.getText().toString());
+                    params.put("id_enquete", id);
+                    params.put("questao", pergunta.getText().toString());
+                    params.put("valorA", respostaA.getText().toString());
+                    params.put("valorB", respostaB.getText().toString());
+                    params.put("valorC", respostaC.getText().toString());
+                    params.put("valorD", respostaD.getText().toString());
+                    params.put("valorE", respostaE.getText().toString());
 
-                StringRequest sr = CRUD.editar(JSON_URL, new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                    try {
-                        JSONObject jo = new JSONObject(response);
-                        boolean enviado = jo.getBoolean("resposta");
-                        if(enviado) {
-                            Toast.makeText(EditEnqueteActivity.this, getResources().getString(R.string.editadoComSucesso), Toast.LENGTH_SHORT).show();
-                        }else{
-                            Toast.makeText(EditEnqueteActivity.this, getResources().getString(R.string.falhaEdicao), Toast.LENGTH_SHORT).show();
+                    StringRequest sr = CRUD.editar(JSON_URL, new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                JSONObject jo = new JSONObject(response);
+                                boolean enviado = jo.getBoolean("resposta");
+                                if (enviado) {
+                                    Toast.makeText(EditEnqueteActivity.this, getResources().getString(R.string.editadoComSucesso), Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(EditEnqueteActivity.this, getResources().getString(R.string.falhaEdicao), Toast.LENGTH_SHORT).show();
+                                }
+                                Intent i = new Intent(EditEnqueteActivity.this, EnquetesActivity.class);
+                                startActivity(i);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
-                        Intent i = new Intent(EditEnqueteActivity.this, EnquetesActivity.class);
-                        startActivity(i);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    }
-                },params,EditEnqueteActivity.this);
-                RequestQueue rq = VolleySingleton.getInstance(EditEnqueteActivity.this).getRequestQueue();
-                rq.add(sr);
-                rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
-                    @Override
-                    public void onRequestFinished(Request<Object> request) {
-                        pd.close();
-                    }
-                });
+                    }, params, EditEnqueteActivity.this);
+                    RequestQueue rq = VolleySingleton.getInstance(EditEnqueteActivity.this).getRequestQueue();
+                    rq.add(sr);
+                    rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                        @Override
+                        public void onRequestFinished(Request<Object> request) {
+                            pd.close();
+                        }
+                    });
+                }else{
+                    Toast.makeText(EditEnqueteActivity.this, getResources().getString(R.string.preenchaOsCamposPrimeiro), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -145,5 +149,10 @@ public class EditEnqueteActivity extends AppCompatActivity {
                 pd.close();
             }
         });
+    }
+    public boolean validarCampos(){
+        return !(pergunta.getText().toString().isEmpty() || respostaA.getText().toString().isEmpty() ||
+                respostaB.getText().toString().isEmpty() || respostaC.getText().toString().isEmpty() ||
+                respostaD.getText().toString().isEmpty() || respostaE.getText().toString().isEmpty());
     }
 }

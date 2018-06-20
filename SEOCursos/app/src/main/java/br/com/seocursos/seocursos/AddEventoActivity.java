@@ -67,67 +67,76 @@ public class AddEventoActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pd.open();
-                Map<String,String> params = new HashMap<String,String>();
+                if(validarCampos()) {
+                    pd.open();
+                    Map<String, String> params = new HashMap<String, String>();
 
-                try{
-                    SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
-                    Date data = null;
-                    data = formato.parse(dia.getText().toString());
-                    formato = new SimpleDateFormat("yyyy-MM-dd");
-                    String dia = formato.format(data);
-                    params.put("nome_evento", nome.getText().toString());
-                    params.put("lugar", local.getText().toString());
-                    params.put("dia", dia);
-                    params.put("telefone", telefone.getText().toString());
-                    params.put("valor", preco.getText().toString());
+                    try {
+                        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+                        Date data = null;
+                        data = formato.parse(dia.getText().toString());
+                        formato = new SimpleDateFormat("yyyy-MM-dd");
+                        String dia = formato.format(data);
+                        params.put("nome_evento", nome.getText().toString());
+                        params.put("lugar", local.getText().toString());
+                        params.put("dia", dia);
+                        params.put("telefone", telefone.getText().toString());
+                        params.put("valor", preco.getText().toString());
 
-                    String dinheiroP="",cartaoCreditoP="",cartaoDebitoP="";
+                        String dinheiroP = "", cartaoCreditoP = "", cartaoDebitoP = "";
 
-                    if(dinheiro.isChecked()){
-                        dinheiroP = "Dinheiro";
-                    }
-                    if(cartaoCredito.isChecked()){
-                        cartaoCreditoP = "Cartão de Crédito";
-                    }
-                    if(cartaoDebito.isChecked()){
-                        cartaoDebitoP = "Cartão de Débito";
-                    }
+                        if (dinheiro.isChecked()) {
+                            dinheiroP = "Dinheiro";
+                        }
+                        if (cartaoCredito.isChecked()) {
+                            cartaoCreditoP = "Cartão de Crédito";
+                        }
+                        if (cartaoDebito.isChecked()) {
+                            cartaoDebitoP = "Cartão de Débito";
+                        }
 
-                    params.put("dinheiro", dinheiroP);
-                    params.put("cartaoCredito", cartaoCreditoP);
-                    params.put("cartaoDebito", cartaoDebitoP);
-                    StringRequest sr = CRUD.inserir(JSON_URL, new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            try {
-                                JSONObject jo = new JSONObject(response);
-                                boolean enviado = jo.getBoolean("resposta");
-                                if(enviado) {
-                                    Toast.makeText(AddEventoActivity.this, getResources().getString(R.string.cadastradoComSucesso), Toast.LENGTH_SHORT).show();
-                                }else{
-                                    Toast.makeText(AddEventoActivity.this, getResources().getString(R.string.falhaCadastro), Toast.LENGTH_SHORT).show();
+                        params.put("dinheiro", dinheiroP);
+                        params.put("cartaoCredito", cartaoCreditoP);
+                        params.put("cartaoDebito", cartaoDebitoP);
+                        StringRequest sr = CRUD.inserir(JSON_URL, new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                try {
+                                    JSONObject jo = new JSONObject(response);
+                                    boolean enviado = jo.getBoolean("resposta");
+                                    if (enviado) {
+                                        Toast.makeText(AddEventoActivity.this, getResources().getString(R.string.cadastradoComSucesso), Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(AddEventoActivity.this, getResources().getString(R.string.falhaCadastro), Toast.LENGTH_SHORT).show();
+                                    }
+                                    Intent i = new Intent(AddEventoActivity.this, EventosActivity.class);
+                                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    startActivity(i);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-                                Intent i = new Intent(AddEventoActivity.this, EventosActivity.class);
-                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                startActivity(i);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
                             }
-                        }
-                    }, params, AddEventoActivity.this);
-                    RequestQueue rq = VolleySingleton.getInstance(AddEventoActivity.this).getRequestQueue();
-                    rq.add(sr);
-                    rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
-                        @Override
-                        public void onRequestFinished(Request<Object> request) {
-                            pd.close();
-                        }
-                    });
-                } catch (ParseException e) {
-                    e.printStackTrace();
+                        }, params, AddEventoActivity.this);
+                        RequestQueue rq = VolleySingleton.getInstance(AddEventoActivity.this).getRequestQueue();
+                        rq.add(sr);
+                        rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                            @Override
+                            public void onRequestFinished(Request<Object> request) {
+                                pd.close();
+                            }
+                        });
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }else{
+                    Toast.makeText(AddEventoActivity.this, getResources().getString(R.string.preenchaOsCamposPrimeiro), Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
+    public boolean validarCampos(){
+        return !(nome.getText().toString().isEmpty() || local.getText().toString().isEmpty() ||
+                dia.getText().toString().isEmpty() || telefone.getText().toString().isEmpty() ||
+                preco.getText().toString().isEmpty());
     }
 }

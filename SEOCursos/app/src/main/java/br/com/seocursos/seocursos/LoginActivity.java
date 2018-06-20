@@ -3,13 +3,19 @@ package br.com.seocursos.seocursos;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
+import android.os.Build;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.DisplayMetrics;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -40,6 +46,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import br.com.seocursos.seocursos.ConstClasses.Usuario;
@@ -148,6 +155,42 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        menu.removeItem(R.id.minhaConta);
+        menu.removeItem(R.id.sair);
+
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Verifica o item selecionado
+        switch (item.getItemId()) {
+            case R.id.portugues:
+                helper.setString("linguagem", "pt");
+                changeLanguage(helper.getString("linguagem"));
+                finish();
+                startActivity(getIntent());
+                return true;
+            case R.id.ingles:
+                helper.setString("linguagem", "en");
+                changeLanguage(helper.getString("linguagem"));
+                finish();
+                startActivity(getIntent());
+                return true;
+            case R.id.espanhol:
+                helper.setString("linguagem", "es");
+                changeLanguage(helper.getString("linguagem"));
+                finish();
+                startActivity(getIntent());
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     @Override
     public void onStart(){
         super.onStart();
@@ -385,5 +428,16 @@ public class LoginActivity extends AppCompatActivity {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
         }
+    }
+    public void changeLanguage(String codigo){
+        Resources res = getResources(); // os recursos
+        DisplayMetrics dm = res.getDisplayMetrics();
+        android.content.res.Configuration conf = res.getConfiguration(); // configuração dos recursos
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) { // verifica a versao do android com o sdk
+            conf.setLocale(new Locale(codigo.toLowerCase()));
+        }else {
+            conf.locale = new Locale(codigo.toLowerCase());
+        }
+        res.updateConfiguration(conf, dm);
     }
 }

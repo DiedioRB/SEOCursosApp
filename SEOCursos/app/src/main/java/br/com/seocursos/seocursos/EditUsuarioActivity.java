@@ -119,83 +119,87 @@ public class EditUsuarioActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pd.open();
-                final Map<String, String> params = new HashMap<String, String>();
+                if(validarCampos()) {
+                    pd.open();
+                    final Map<String, String> params = new HashMap<String, String>();
 
-                params.put("id_usuario", id);
-                params.put("nome", nome.getText().toString());
-                params.put("email", email.getText().toString());
-                params.put("cpf", cpf.getText().toString());
-                params.put("cep", cep.getText().toString());
-                params.put("endereco", endereco.getText().toString());
-                params.put("numero", numero.getText().toString());
-                params.put("cidade", cidade.getText().toString());
-                params.put("estado", estado.getText().toString());
+                    params.put("id_usuario", id);
+                    params.put("nome", nome.getText().toString());
+                    params.put("email", email.getText().toString());
+                    params.put("cpf", cpf.getText().toString());
+                    params.put("cep", cep.getText().toString());
+                    params.put("endereco", endereco.getText().toString());
+                    params.put("numero", numero.getText().toString());
+                    params.put("cidade", cidade.getText().toString());
+                    params.put("estado", estado.getText().toString());
 
-                if(imagem != null) {
-                    String imagemUsuario = getStringImage(imagem);
-                    params.put("foto", imagemUsuario);
-                    params.put("newImage", "newImage");
-                }else{
-                    params.put("foto", image);
-                }
+                    if (imagem != null) {
+                        String imagemUsuario = getStringImage(imagem);
+                        params.put("foto", imagemUsuario);
+                        params.put("newImage", "newImage");
+                    } else {
+                        params.put("foto", image);
+                    }
 
-                String sexoS;
-                if (sexo.getCheckedRadioButtonId() == R.id.masculinoUsuario) {
-                    sexoS = "M";
-                } else {
-                    sexoS = "F";
-                }
-                params.put("sexo", sexoS);
+                    String sexoS;
+                    if (sexo.getCheckedRadioButtonId() == R.id.masculinoUsuario) {
+                        sexoS = "M";
+                    } else {
+                        sexoS = "F";
+                    }
+                    params.put("sexo", sexoS);
 
-                switch(privilegio){
-                    case "A":
-                        params.put("tipoUsuario", "A");
+                    switch (privilegio) {
+                        case "A":
+                            params.put("tipoUsuario", "A");
 
-                        params.put("telUsuario", telUsuario.getText().toString());
-                        break;
-                    case "T":
-                        params.put("tipoUsuario", "T");
+                            params.put("telUsuario", telUsuario.getText().toString());
+                            break;
+                        case "T":
+                            params.put("tipoUsuario", "T");
 
-                        params.put("dataNascimento", dataNascimento.getText().toString());
-                        params.put("telRes", telRes.getText().toString());
-                        params.put("telCel", telCel.getText().toString());
-                        params.put("curso", curso.getText().toString());
-                        params.put("instituicao", instituicao.getText().toString());
-                        params.put("anoConclusao", anoConclusao.getText().toString());
-                        break;
-                    case "D":
-                        params.put("tipoUsuario", "D");
-                        break;
-                }
+                            params.put("dataNascimento", dataNascimento.getText().toString());
+                            params.put("telRes", telRes.getText().toString());
+                            params.put("telCel", telCel.getText().toString());
+                            params.put("curso", curso.getText().toString());
+                            params.put("instituicao", instituicao.getText().toString());
+                            params.put("anoConclusao", anoConclusao.getText().toString());
+                            break;
+                        case "D":
+                            params.put("tipoUsuario", "D");
+                            break;
+                    }
 
-                StringRequest sr = CRUD.editar(JSON_URL, new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jo = new JSONObject(response);
-                            boolean enviado = jo.getBoolean("resposta");
-                            if (enviado) {
-                                Toast.makeText(EditUsuarioActivity.this, getResources().getString(R.string.editadoComSucesso), Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(EditUsuarioActivity.this, getResources().getString(R.string.falhaEdicao), Toast.LENGTH_SHORT).show();
+                    StringRequest sr = CRUD.editar(JSON_URL, new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                JSONObject jo = new JSONObject(response);
+                                boolean enviado = jo.getBoolean("resposta");
+                                if (enviado) {
+                                    Toast.makeText(EditUsuarioActivity.this, getResources().getString(R.string.editadoComSucesso), Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(EditUsuarioActivity.this, getResources().getString(R.string.falhaEdicao), Toast.LENGTH_SHORT).show();
+                                }
+                                Intent i = new Intent(EditUsuarioActivity.this, UsuariosActivity.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(i);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                            Intent i = new Intent(EditUsuarioActivity.this, UsuariosActivity.class);
-                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(i);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                    }
-                }, params, getApplicationContext());
-                RequestQueue rq = VolleySingleton.getInstance(EditUsuarioActivity.this).getRequestQueue();
-                rq.add(sr);
-                rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
-                    @Override
-                    public void onRequestFinished(Request<Object> request) {
-                        pd.close();
-                    }
-                });
+                    }, params, getApplicationContext());
+                    RequestQueue rq = VolleySingleton.getInstance(EditUsuarioActivity.this).getRequestQueue();
+                    rq.add(sr);
+                    rq.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+                        @Override
+                        public void onRequestFinished(Request<Object> request) {
+                            pd.close();
+                        }
+                    });
+                }else{
+                    Toast.makeText(EditUsuarioActivity.this, getResources().getString(R.string.preenchaOsCamposPrimeiro), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -396,5 +400,33 @@ public class EditUsuarioActivity extends AppCompatActivity {
         String temp = Base64.encodeToString(b, Base64.DEFAULT);
 
         return temp;
+    }
+    public boolean validarCampos(){
+        if(!(nome.getText().toString().isEmpty() || email.getText().toString().isEmpty() ||
+                cpf.getText().toString().isEmpty() || cep.getText().toString().isEmpty() ||
+                endereco.getText().toString().isEmpty() || numero.getText().toString().isEmpty() ||
+                cidade.getText().toString().isEmpty() || estado.getText().toString().isEmpty())){
+            boolean isValid = false;
+            switch(privilegio){
+                case "A":
+                    if(!(telUsuario.getText().toString().isEmpty())){
+                        isValid = true;
+                    }
+                    break;
+                case "T":
+                    if(!(telCel.getText().toString().isEmpty() || telRes.getText().toString().isEmpty() ||
+                            dataNascimento.getText().toString().isEmpty() || curso.getText().toString().isEmpty() ||
+                            instituicao.getText().toString().isEmpty() || anoConclusao.getText().toString().isEmpty())){
+                        isValid = true;
+                    }
+                    break;
+                case "D":
+                    isValid = true;
+                    break;
+            }
+            return isValid;
+        }else{
+            return false;
+        }
     }
 }

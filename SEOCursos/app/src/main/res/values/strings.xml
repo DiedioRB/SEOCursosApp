@@ -3,7 +3,7 @@
     <string name="facebook_app_id" translatable="false">1530907060331272</string>
     <string name="fb_login_protocol_scheme" translatable="false">fb1530907060331272</string>
 
-    <string name="fazerLogin">Fazer Login</string>
+    <string name="fazerLogin" translatable="false">Login</string>
     <string name="minhaConta">Minha Conta</string>
     <string name="sair">Sair</string>
     <string name="cadastreSeAqui">Cadastre-se Aqui!</string>
@@ -195,11 +195,17 @@
 
     <string name="aguarde">Aguarde&#8230;</string>
     <string name="semConexaoComAInternet">Sem conexão com a internet!</string>
+    <string name="senhasAmbiguas">Senhas Ambíguas!</string>
 
     <string name="mensagemRecuperacaoSenha">
         Uma mensagem foi enviada ao seu e-mail!
         Você tem uma semana para recuperar a senha!
     </string>
+
+    <string name="linguagem">Linguagem</string>
+    <string name="portugues">Português</string>
+    <string name="ingles">Inglês</string>
+    <string name="espanhol">Espanhol</string>
 
     <string name="asset_statements" translatable="false">[{\n  \"relation\": [\"delegate_permission/common.handle_all_urls\"],\n  \"target\": {\n    \"namespace\": \"web\",\n    \"site\": \"https://seocursos.com.br\",\n  }\n}]</string>
 </resources>
